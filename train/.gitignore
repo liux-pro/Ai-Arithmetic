@@ -1,0 +1,10 @@
+.idea
+.venv
+mnist
+qmnist
+__pycache__
+*.tflite
+*.h5
+*.tmdl
+*.h
+*.nbconvert.ipynb
