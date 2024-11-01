@@ -1,0 +1,8 @@
+Listings
+*.uvopt
+*.uvgui.Legend
+uv4.log
+
+Objects/*
+
+.vscode

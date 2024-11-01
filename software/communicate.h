@@ -1,0 +1,2 @@
+#define CMD_SET_WINDOW 0x01
+#define CMD_SET_BRIGHTNESS 0x02
