@@ -43,9 +43,9 @@ TM_INLINE void l_postprocess_sum(sumtype_t sum, btype_t b, int act,
 #elif (TM_MDL_TYPE == TM_MDL_INT8) || (TM_MDL_TYPE == TM_MDL_INT16)
 
 #if TM_FASTSCALE
-static int32_t sumscale[TM_MAX_CSIZE];
+static int32_t xdata sumscale[TM_MAX_CSIZE];
 #else
-static float sumscale[TM_MAX_CSIZE];
+static float xdata sumscale[TM_MAX_CSIZE];
 #endif
 #define SUMSCALE (sumscale[c])
 

@@ -44,7 +44,7 @@ def h5_to_tflite(h5_name, tflite_name, is_quant, quant_dir, norm_type = None, me
 
         def random_sample(my_list):
             # 选择不超过列表长度的 200 个元素
-            sample_size = min(len(my_list), 200)
+            sample_size = min(len(my_list), 2000)
             return random.sample(my_list, sample_size)
         valid_files=random_sample(valid_files)
 

@@ -12,25 +12,9 @@
 #include "STC32G_NVIC.h"
 #include "STC32G_Clock.h"
 #include <string.h>
-#include "communicate.h"
 #include "STC32G_PWM.h"
 #include "STC32G_Timer.h"
 #include "tinymaix.h"
-
-/*
-IRC频率必须是 35.000MHz
-*/
-
-void Delay1000ms(void) //@24.000MHz
-{
-	unsigned long edata i;
-
-	_nop_();
-	_nop_();
-	i = 5999998UL;
-	while (i)
-		i--;
-}
 
 /****************  SPI初始化函数 *****************/
 void SPI_config1(void)
@@ -47,6 +31,7 @@ void SPI_config1(void)
 
 /**
  * 检查是否接收到特定的ISP固件升级请求。
+ * 需要配合usb cdc使用,每次接收到信息,先检查这个
  */
 void checkISP()
 {
@@ -54,12 +39,13 @@ void checkISP()
 	if (memcmp("@STCISP#", RxBuffer, 8) == 0)
 	{
 		usb_write_reg(OUTCSR1, 0);
-
 		USBCON = 0x00;
 		USBCLK = 0x00;
 		IRC48MCR = 0x00;
 
-		delay_ms(10);
+		P3M0 &= ~0x03; // 设置为高阻
+		P3M1 |= 0x03;
+		delay_ms(10); // 留足时间给usb线插好
 		// 复位到bootloader
 		IAP_CONTR = 0x60;
 		while (1)
@@ -71,7 +57,6 @@ char putchar(char c)
 {
 	TxBuffer[0] = c;
 	uart_send(1);
-
 	return c;
 }
 
@@ -129,14 +114,6 @@ void xy_reset()
 	NOP4();
 }
 
-BOOL check_touch()
-{
-
-	P01 = 1;
-
-	return Get_ADC12bitResult(11);
-}
-
 u16 x_read()
 {
 	xy_reset();
@@ -163,6 +140,7 @@ u16 y_read()
 	return Get_ADC12bitResult(8);
 }
 
+// 映射adc到实际坐标
 u16 remap(u16 adc_value, u16 adc_min, u16 adc_max, u16 output_min, u16 output_max)
 {
 	u32 normalized;
@@ -192,6 +170,7 @@ u16 remap(u16 adc_value, u16 adc_min, u16 adc_max, u16 output_min, u16 output_ma
 #define SAMP_CNT 4
 #define SAMP_CNT_DIV2 2
 u16 X, Y;
+// 抄的adc滤波代码  https://www.cnblogs.com/yuphone/archive/2010/11/28/1890239.html
 u8 touch_scan(void)
 {
 	u8 i, j, k, min;
@@ -224,48 +203,12 @@ u8 touch_scan(void)
 		// 求中间值的均值
 		XY[k] = (tempXY[k][SAMP_CNT_DIV2] + tempXY[k][SAMP_CNT_DIV2 - 1]) / 2;
 	}
-	// 矫正坐标
 	X = XY[0];
 	Y = XY[1];
 	return 1;
 }
 
-
-
-#if 0
-static uint8_t mnist_pic[28*28]={
-  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,116,125,171,255,255,150, 93,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-  0,  0,  0,  0,  0,  0,  0,  0,  0,169,253,253,253,253,253,253,218, 30,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-  0,  0,  0,  0,  0,  0,  0,  0,169,253,253,253,213,142,176,253,253,122,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-  0,  0,  0,  0,  0,  0,  0, 52,250,253,210, 32, 12,  0,  6,206,253,140,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-  0,  0,  0,  0,  0,  0,  0, 77,251,210, 25,  0,  0,  0,122,248,253, 65,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-  0,  0,  0,  0,  0,  0,  0,  0, 31, 18,  0,  0,  0,  0,209,253,253, 65,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,117,247,253,198, 10,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 76,247,253,231, 63,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,128,253,253,144,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,176,246,253,159, 12,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 25,234,253,233, 35,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,198,253,253,141,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-  0,  0,  0,  0,  0,  0,  0,  0,  0, 78,248,253,189, 12,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-  0,  0,  0,  0,  0,  0,  0,  0, 19,200,253,253,141,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-  0,  0,  0,  0,  0,  0,  0,  0,134,253,253,173, 12,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-  0,  0,  0,  0,  0,  0,  0,  0,248,253,253, 25,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-  0,  0,  0,  0,  0,  0,  0,  0,248,253,253, 43, 20, 20, 20, 20,  5,  0,  5, 20, 20, 37,150,150,150,147, 10,  0,
-  0,  0,  0,  0,  0,  0,  0,  0,248,253,253,253,253,253,253,253,168,143,166,253,253,253,253,253,253,253,123,  0,
-  0,  0,  0,  0,  0,  0,  0,  0,174,253,253,253,253,253,253,253,253,253,253,253,249,247,247,169,117,117, 57,  0,
-  0,  0,  0,  0,  0,  0,  0,  0,  0,118,123,123,123,166,253,253,253,155,123,123, 41,  0,  0,  0,  0,  0,  0,  0,
-  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-};
-#else
-static uint8_t xdata mnist_pic[28*28]={0};
-#endif
+static uint8_t xdata mnist_pic[28 * 28] = {0};
 
 #include "TinyMaix/mnist_valid_q_be.h"
 bit busy;
@@ -273,110 +216,93 @@ char wptr;
 char rptr;
 char buffer[16];
 
-#define IMG_L   (28)
-#define IMG_CH  (1)
-#define CLASS_N (10)
+#define IMG_L (28)
+#define IMG_CH (1)
+#define CLASS_N (14)
 static uint8_t xdata mdl_buf[MDL_BUF_LEN];
-static tm_err_t layer_cb(tm_mdl_t* mdl, tml_head_t* lh)
-{   //dump middle result
-	//   int x,y,c;
-    // int h = lh->out_dims[1];
-    // int w = lh->out_dims[2];
-    // int ch= lh->out_dims[3];
-	//   mtype_t* output = TML_GET_OUTPUT(mdl, lh);
-    // return TM_OK;
-    // TM_PRINTF("Layer %d callback ========\n", mdl->layer_i);
-    // #if 1
-    // for(y=0; y<h; y++){
-    //     TM_PRINTF("[");
-    //     for(x=0; x<w; x++){
-    //         TM_PRINTF("[");
-    //         for(c=0; c<ch; c++){
-    //         #if TM_MDL_TYPE == TM_MDL_FP32
-    //             TM_PRINTF("%.3f,", output[(y*w+x)*ch+c]);
-    //         #else
-    //             TM_PRINTF("%.3f,", TML_DEQUANT(lh,output[(y*w+x)*ch+c]));
-    //         #endif
-    //         }
-    //         TM_PRINTF("],");
-    //     }
-    //     TM_PRINTF("],\n");
-    // }
-    // TM_PRINTF("\n");
-    // #endif
-    return TM_OK;
-}
-
-static void parse_output(tm_mat_t* outs)
+static tm_err_t layer_cb(tm_mdl_t *mdl, tml_head_t *lh)
 {
-    tm_mat_t out = outs[0];
-    float* dat  = (float*)out.dat;
-    float maxp = 0;
-    int maxi = -1;
-	  int i=0;
-    for(; i<CLASS_N; i++){
-        if(dat[i] > maxp) {
-            maxi = i;
-            maxp = dat[i];
-        }
-    }
-    TM_PRINTF("### Predict output is: Number %d , Prob %.3f\r\n", maxi, maxp);
-    return;
+	// 这个回调函数应该写null就行,但是不行,为知道为什么
+	// 弄个空函数吧
+	return TM_OK;
 }
 
-//插入usb线时，由于usb接口机械设计，vcc会先接通，然后才是d+d-
-//而stc的逻辑是开机检测d+d-接好，且boot引脚P3.2为0，才进入usb下载模式
-//这样按住boot，插usb，大概率由于这个机械结构，在检测d+d-时，d+d-大概率没有插到位
-//导致进入boot失败
-//在程序最前面首先执行这个函数，重新检测boot，然后强跳转程序到下载模式
-//就可以实现，按住boot插usb，一定跳转到下载模式
-//同时，由于他在代码最前面执行，即使后续程序会死机，这段代码也能先执行，完美救砖
-void check_boot(){
-    // P3.2 输入模式  开启上拉电阻
-    P3M0 &= ~0x04; P3M1 |= 0x04; 
-    P3PU |= 0x04; 
-	delay_ms(1);
-	if (P32==0)
+static void parse_output(tm_mat_t *outs)
+{
+	tm_mat_t out = outs[0];
+	float *dat = (float *)out.dat;
+	float maxp = 0;
+	int maxi = -1;
+	int i = 0;
+	for (; i < CLASS_N; i++)
 	{
-		P3M0 &= ~0x03;	//设置为高阻
+		if (dat[i] > maxp)
+		{
+			maxi = i;
+			maxp = dat[i];
+		}
+	}
+	TM_PRINTF("### Predict output is: Number %d , Prob %.3f\r\n", maxi, maxp);
+	return;
+}
+
+// 插入usb线时，由于usb接口机械设计，vcc会先接通，然后才是d+d-
+// 而stc的逻辑是开机检测d+d-接好，且boot引脚P3.2为0，才进入usb下载模式
+// 这样按住boot，插usb，大概率由于这个机械结构，在检测d+d-时，d+d-大概率没有插到位
+// 导致进入boot失败
+// 在程序最前面首先执行这个函数，重新检测boot，然后强跳转程序到下载模式
+// 就可以实现，按住boot插usb，一定跳转到下载模式
+// 同时，由于他在代码最前面执行，即使后续程序会死机，这段代码也能先执行，完美救砖
+void check_boot()
+{
+	// P3.2 输入模式  开启上拉电阻
+	P3M0 &= ~0x04;
+	P3M1 |= 0x04;
+	P3PU |= 0x04;
+	delay_ms(1);
+	if (P32 == 0)
+	{
+		usb_write_reg(OUTCSR1, 0);
+		USBCON = 0x00;
+		USBCLK = 0x00;
+		IRC48MCR = 0x00;
+
+		P3M0 &= ~0x03; // 设置为高阻
 		P3M1 |= 0x03;
-		delay_ms(500); //留足时间给usb线插好
+		delay_ms(500); // 留足时间给usb线插好
 		// 复位到bootloader
 		IAP_CONTR = 0x60;
 		while (1)
 			;
 	}
 	// 关闭上拉电阻
-    P3PU &= ~0x04; 
+	P3PU &= ~0x04;
 }
 
 void main(void)
 {
-	u16 touch_x, touch_y;
-	u8 i;
-	BYTE *p_UsbBuffer;
-		  tm_mdl_t mdl;
-    tm_mat_t in_uint8; 
-    tm_mat_t in; 
-    tm_mat_t outs[1];
-    tm_err_t res;
+	tm_mdl_t mdl;
+	tm_mat_t in_uint8;
+	tm_mat_t in;
+	tm_mat_t outs[1];
+	tm_err_t res;
 
 	in_uint8.dims = 3;
-    in_uint8.h    = IMG_L;
-    in_uint8.w    = IMG_L;
-    in_uint8.c    = IMG_CH;
-    in_uint8.dat  = (mtype_t*)mnist_pic;
-		
+	in_uint8.h = IMG_L;
+	in_uint8.w = IMG_L;
+	in_uint8.c = IMG_CH;
+	in_uint8.dat = (mtype_t *)mnist_pic;
+
 	in.dims = 3;
-    in.h    = IMG_L;
-    in.w    = IMG_L;
-    in.c    = IMG_CH;
-    in.dat  = NULL;
+	in.h = IMG_L;
+	in.w = IMG_L;
+	in.c = IMG_CH;
+	in.dat = NULL;
 
 	WTST = 0;  // 设置程序指令延时参数，赋值为0可将CPU执行指令的速度设置为最快
 	EAXFR = 1; // 扩展寄存器(XFR)访问使能
 	CKCON = 0; // 提高访问XRAM速度
-		check_boot();
+	check_boot();
 
 	uart_init();
 	usb_init();
@@ -398,75 +324,77 @@ void main(void)
 	LCD_WriteRAM_Prepare();
 	SPI_DC = 1;
 	configBlackLightPWM(255);
-			res = tm_load(&mdl, mdl_data, mdl_buf, layer_cb, &in);
-			if(res != TM_OK) {
-				TM_PRINTF("tm model load err %d\r\n", res);
-				return ;
-			}
+	res = tm_load(&mdl, mdl_data, mdl_buf, layer_cb, &in);
+	if (res != TM_OK)
+	{
+		TM_PRINTF("tm model load err %d\r\n", res);
+		return;
+	}
 
 	while (1)
 	{
-		
+
 		if (RxFlag)
 		{
 			checkISP();
 			printf("touch_x: %d touch_y:%d\n", X, Y);
 			uart_recv_done(); // 对接收的数据处理完成后,一定要调用一次这个函数,以便CDC接收下一笔串口数据
-						// TM_DBGT_START();
-						
-            {
+							  // TM_DBGT_START();
+
+			{
 				int xxx;
-				    for(xxx=0 ; xxx<28*28; xxx++){
+				for (xxx = 0; xxx < 28 * 28; xxx++)
+				{
 					TM_PRINTF("%3d,", mnist_pic[xxx]);
-					if(xxx%28==27)printf("\r\n");
+					if (xxx % 28 == 27)
+						printf("\r\n");
 				}
 			}
-			res = tm_preprocess(&mdl, TMPP_UINT2INT, &in_uint8, &in); 
+			res = tm_preprocess(&mdl, TMPP_UINT2INT, &in_uint8, &in);
 
 			res = tm_run(&mdl, &in, outs);
-			// TM_DBGT("tm_run");
 
-			if(res==TM_OK) parse_output(outs);  
+			if (res == TM_OK)
+			{
+				parse_output(outs);
+			}
+			{
+				int xxx;
+				for (xxx = 0; xxx < 28 * 28; xxx++)
+				{
+
+					mnist_pic[xxx] = 0;
+				}
+			}
+			LCD_Clear(GREEN);
 		}
-			// tm_stat((tm_mdlbin_t*)mdl_data); 
-
-
-				
-
 
 		if (touch_scan())
 		{
-			u16 x,y;
-			x=remap(X, 535, 3600, 0, 320);
-			y= remap(Y, 600, 3300, 0, 240);
-			if ((x==0 )||( y==0))
+			u16 x, y;
+			x = remap(X, 535, 3600, 0, 320);
+			y = remap(Y, 600, 3300, 0, 240);
+			if ((x == 0) || (y == 0))
 			{
 				continue;
 			}
-			
 
-			// if (x>16 && x<96)
-			// {
-			// 	if (y>16 && y<96)
-			// 	{
-					//todo 优化
-					LCD_Fill(x,y,x+4,y+4);
-					mnist_pic[(x / 4+1) + (y / 4)* 28 ] = 255;	
-					mnist_pic[(x / 4) + (y / 4+1)* 28 ] = 255;
-					mnist_pic[(x / 4+1) + (y / 4+1)* 28 ] = 255;	
-					mnist_pic[(x / 4) + (y / 4) * 28] = 255;	
-
-			// 	}
-			// }
-			
-
-     		// mnist_pic
-			// LCD_DrawPoint(x+1, y);
-			// LCD_DrawPoint(x-1, y);
-			// LCD_DrawPoint(x, y+1);
-			// LCD_DrawPoint(x, y-1);
-            // LCD_DrawPoint(x, y);
+			if (x > 16 && x < 96)
+			{
+				if (y > 16 && y < 96)
+				{
+					// 			if ( x < 112)
+					// {
+					// 	if (y < 112)
+					// 	{
+					// todo 优化
+					LCD_Fill(x, y, x + 4, y + 4, BLACK);
+					mnist_pic[(x / 4 + 1) + (y / 4) * 28] = 255;
+					mnist_pic[(x / 4) + (y / 4 + 1) * 28] = 255;
+					mnist_pic[(x / 4 + 1) + (y / 4 + 1) * 28] = 255;
+					mnist_pic[(x / 4) + (y / 4) * 28] = 255;
+				}
+			}
 		}
-
 	}
 }

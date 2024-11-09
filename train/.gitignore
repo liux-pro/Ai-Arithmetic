@@ -2,6 +2,8 @@
 .venv
 mnist
 qmnist
+dml
+extend
 __pycache__
 *.tflite
 *.h5
