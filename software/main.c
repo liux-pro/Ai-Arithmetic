@@ -389,9 +389,9 @@ void main(void)
 					// 	{
 					// todo ”≈ªØ
 					LCD_Fill(x, y, x + 4, y + 4, BLACK);
-					mnist_pic[(x / 4 + 1) + (y / 4) * 28] = 255;
-					mnist_pic[(x / 4) + (y / 4 + 1) * 28] = 255;
-					mnist_pic[(x / 4 + 1) + (y / 4 + 1) * 28] = 255;
+					// mnist_pic[(x / 4 + 1) + (y / 4) * 28] = 255;
+					// mnist_pic[(x / 4) + (y / 4 + 1) * 28] = 255;
+					// mnist_pic[(x / 4 + 1) + (y / 4 + 1) * 28] = 255;
 					mnist_pic[(x / 4) + (y / 4) * 28] = 255;
 				}
 			}
