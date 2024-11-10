@@ -4,9 +4,11 @@ mnist
 qmnist
 dml
 extend
+data
 __pycache__
 *.tflite
 *.h5
+*.keras
 *.tmdl
 *.h
 *.nbconvert.ipynb

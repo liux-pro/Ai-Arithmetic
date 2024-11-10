@@ -1,7 +1,7 @@
 import cv2
 import os
 
-
+# 灰度图反转
 def invert_images_in_directory(src_directory, dst_directory):
     # 确保目标目录存在
     if not os.path.exists(dst_directory):

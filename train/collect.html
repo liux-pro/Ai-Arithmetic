@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>手写收集图片数据集</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .canvas-container {
+            display: inline-block;
+            margin: 10px;
+            text-align: center;
+        }
+        canvas {
+            border: 1px solid black;
+            margin-bottom: 10px;
+            touch-action: none; /* Prevent scrolling while drawing */
+        }
+    </style>
+</head>
+<body>
+    <h1>手写收集图片数据集</h1>
+    <div id="canvasArea">
+        <div class="canvas-container">
+            <canvas id="canvas1" width="140" height="140"></canvas>
+        </div>
+        <div class="canvas-container">
+            <canvas id="canvas2" width="140" height="140"></canvas>
+        </div>
+        <div class="canvas-container">
+            <canvas id="canvas3" width="140" height="140"></canvas>
+        </div>
+        <div class="canvas-container">
+            <canvas id="canvas4" width="140" height="140"></canvas>
+        </div>
+    </div>
+    <div id="images"></div>
+
+    <script>
+        const canvases = [
+            document.getElementById('canvas1'),
+            document.getElementById('canvas2'),
+            document.getElementById('canvas3'),
+            document.getElementById('canvas4')
+        ];
+        let drawingCanvasIndex = -1;
+
+        canvases.forEach((canvas, index) => {
+            initializeCanvas(canvas, index);
+        });
+
+        function initializeCanvas(canvas, index) {
+            const ctx = canvas.getContext('2d');
+            let drawing = false;
+
+            canvas.addEventListener('mousedown', (e) => startDrawing(e, index));
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mousemove', (e) => draw(e, index));
+            canvas.addEventListener('touchstart', (e) => startDrawing(e, index));
+            canvas.addEventListener('touchend', stopDrawing);
+            canvas.addEventListener('touchmove', (e) => draw(e, index));
+
+            function startDrawing(e, index) {
+                if (drawingCanvasIndex !== -1 && drawingCanvasIndex !== index) {
+                    saveImage(drawingCanvasIndex);
+                    clearCanvas(drawingCanvasIndex);
+                }
+                drawingCanvasIndex = index;
+                drawing = true;
+                draw(e, index);
+            }
+
+            function stopDrawing() {
+                drawing = false;
+                ctx.beginPath();
+            }
+
+            function draw(e, index) {
+                if (!drawing) return;
+
+                e.preventDefault();
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.clientX || e.touches[0].clientX;
+                const clientY = e.clientY || e.touches[0].clientY;
+
+                ctx.lineWidth = 10;
+                ctx.lineCap = 'round';
+                ctx.strokeStyle = 'black';
+
+                ctx.lineTo(clientX - rect.left, clientY - rect.top);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(clientX - rect.left, clientY - rect.top);
+            }
+        }
+
+        function clearCanvas(index) {
+            const canvas = canvases[index];
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function saveImage(index) {
+            const canvas = canvases[index];
+            const ctx = canvas.getContext('2d');
+            const newCanvas = document.createElement('canvas');
+            newCanvas.width = 28;
+            newCanvas.height = 28;
+            const newCtx = newCanvas.getContext('2d');
+            newCtx.drawImage(canvas, 0, 0, 28, 28);
+
+            const image = newCanvas.toDataURL();
+            const imgElement = document.createElement('img');
+            imgElement.src = image;
+            document.getElementById('images').appendChild(imgElement);
+        }
+    </script>
+</body>
+</html>
