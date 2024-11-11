@@ -1,0 +1,29 @@
+name: Run TensorFlow on Jupyter Notebook
+
+on:
+  push:
+    branches:
+      - master  # 可以修改为你想要触发的分支
+
+jobs:
+  run_notebook:
+    runs-on: ubuntu-latest  # 使用最新的 Ubuntu 环境
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4  # 检出当前仓库代码
+
+      - name: Build Image
+        run: |
+          docker build train -t tensorflow    
+
+      - name: Run Jupyter Notebook
+        run: |
+          docker run --rm -v $(pwd)/train:/workspace -w /workspace tensorflow \
+          bash -c "papermill -k python --log-output good-mnist.ipynb output.ipynb"
+
+      - name: Upload generated .h files as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-header-files
+          path: train/*.h  # 上传生成的 .h 文件

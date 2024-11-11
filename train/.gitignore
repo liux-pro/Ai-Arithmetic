@@ -4,7 +4,7 @@ mnist
 qmnist
 dml
 extend
-data
+dataset
 __pycache__
 *.tflite
 *.h5
@@ -12,3 +12,4 @@ __pycache__
 *.tmdl
 *.h
 *.nbconvert.ipynb
+output.ipynb
