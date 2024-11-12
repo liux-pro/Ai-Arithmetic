@@ -222,8 +222,37 @@ char buffer[16];
 static uint8_t xdata mdl_buf[MDL_BUF_LEN];
 static tm_err_t layer_cb(tm_mdl_t *mdl, tml_head_t *lh)
 {
-	// 这个回调函数应该写null就行,但是不行,为知道为什么
-	// 弄个空函数吧
+#if TM_ENABLE_STAT
+	// dump middle result
+	int x, y, c;
+	int h = lh->out_dims[1];
+	int w = lh->out_dims[2];
+	int ch = lh->out_dims[3];
+	mtype_t *output = TML_GET_OUTPUT(mdl, lh);
+	return TM_OK;
+	TM_PRINTF("Layer %d callback ========\n", mdl->layer_i);
+#if 1
+	for (y = 0; y < h; y++)
+	{
+		TM_PRINTF("[");
+		for (x = 0; x < w; x++)
+		{
+			TM_PRINTF("[");
+			for (c = 0; c < ch; c++)
+			{
+#if TM_MDL_TYPE == TM_MDL_FP32
+				TM_PRINTF("%.3f,", output[(y * w + x) * ch + c]);
+#else
+				TM_PRINTF("%.3f,", TML_DEQUANT(lh, output[(y * w + x) * ch + c]));
+#endif
+			}
+			TM_PRINTF("],");
+		}
+		TM_PRINTF("],\n");
+	}
+	TM_PRINTF("\n");
+#endif
+#endif
 	return TM_OK;
 }
 
@@ -324,6 +353,7 @@ void main(void)
 	LCD_WriteRAM_Prepare();
 	SPI_DC = 1;
 	configBlackLightPWM(255);
+
 	res = tm_load(&mdl, mdl_data, mdl_buf, layer_cb, &in);
 	if (res != TM_OK)
 	{
@@ -337,12 +367,13 @@ void main(void)
 		if (RxFlag)
 		{
 			checkISP();
-			printf("touch_x: %d touch_y:%d\n", X, Y);
+			// printf("touch_x: %d touch_y:%d\n", X, Y);
 			uart_recv_done(); // 对接收的数据处理完成后,一定要调用一次这个函数,以便CDC接收下一笔串口数据
 							  // TM_DBGT_START();
-
+#if TM_ENABLE_STAT
 			{
 				int xxx;
+				tm_stat((tm_mdlbin_t *)mdl_data);
 				for (xxx = 0; xxx < 28 * 28; xxx++)
 				{
 					TM_PRINTF("%3d,", mnist_pic[xxx]);
@@ -350,6 +381,7 @@ void main(void)
 						printf("\r\n");
 				}
 			}
+#endif
 			res = tm_preprocess(&mdl, TMPP_UINT2INT, &in_uint8, &in);
 
 			res = tm_run(&mdl, &in, outs);

@@ -32,8 +32,8 @@ limitations under the License.
 #define TM_LOCAL_MATH   (0)         //use local math func (like exp()) to avoid libm
 #define TM_ENABLE_STAT  (0)         //enable mdl stat functions
 #define TM_MAX_CSIZE    (32)      //max channel num //used if INT8 mdl  //cost TM_MAX_CSIZE*4 Byte
-#define TM_MAX_KSIZE    (3*3)       //max kernel_size   //cost TM_MAX_KSIZE*4 Byte
-#define TM_MAX_KCSIZE   (3*3*32)   //max kernel_size*channels //cost TM_MAX_KSIZE*sizeof(mtype_t) Byte
+#define TM_MAX_KSIZE    (5*5)       //max kernel_size   //cost TM_MAX_KSIZE*4 Byte
+#define TM_MAX_KCSIZE   (5*5*32)   //max kernel_size*channels //cost TM_MAX_KSIZE*sizeof(mtype_t) Byte
 
 #define TM_INLINE       
 #define TM_WEAK         
