@@ -13,14 +13,14 @@
       <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
-          <Device>STC32G12K128 Series</Device>
-          <Vendor>STC</Vendor>
-          <Cpu>IRAM(0-0xFFF) XRAM(0x10000-0x11FFF) IROM(0xFE0000-0xFFFFFF) CLOCK(35000000)</Cpu>
+          <Device>AI8051U-32Bit Series</Device>
+          <Vendor>AI</Vendor>
+          <Cpu>IRAM(0-0x7FF) XRAM(0x10000-0x17FFF) IROM(0xFF0000-0xFFFFFF) CLOCK(35000000)</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile>"LIB\STARTUP251.ASM" ("80251 Startup Code")</StartupFile>
           <FlashDriverDll></FlashDriverDll>
-          <DeviceId>63457</DeviceId>
-          <RegisterFile>STC32G.H</RegisterFile>
+          <DeviceId>30900</DeviceId>
+          <RegisterFile>AI8051U.H</RegisterFile>
           <MemoryEnv></MemoryEnv>
           <Cmp></Cmp>
           <Asm></Asm>
@@ -36,7 +36,7 @@
           <BinPath>D:\keil\c251\C251\BIN\</BinPath>
           <IncludePath></IncludePath>
           <LibPath></LibPath>
-          <RegisterFilePath></RegisterFilePath>
+          <RegisterFilePath>STC\</RegisterFilePath>
           <DBRegisterFilePath>STC\</DBRegisterFilePath>
           <TargetStatus>
             <Error>0</Error>
@@ -211,18 +211,18 @@
               </RCB>
               <IROM>
                 <Type>1</Type>
-                <StartAddress>0xfe0000</StartAddress>
-                <Size>0x20000</Size>
+                <StartAddress>0xff0000</StartAddress>
+                <Size>0x10000</Size>
               </IROM>
               <IRAM>
                 <Type>0</Type>
                 <StartAddress>0x0</StartAddress>
-                <Size>0x1000</Size>
+                <Size>0x800</Size>
               </IRAM>
               <XRAM>
                 <Type>0</Type>
                 <StartAddress>0x10000</StartAddress>
-                <Size>0x2000</Size>
+                <Size>0x8000</Size>
               </XRAM>
               <Ocm1>
                 <Type>0</Type>
