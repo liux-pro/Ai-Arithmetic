@@ -15,6 +15,7 @@
 #include "STC32G_PWM.h"
 #include "STC32G_Timer.h"
 #include "tinymaix.h"
+#include "expression.h"
 
 /****************  SPI初始化函数 *****************/
 void SPI_config1(void)
@@ -225,8 +226,11 @@ static uint8_t xdata mdl_buf[MDL_BUF_LEN];
 static uint8_t xdata mnist_pic[28 * 28] = {0};
 // 这里可以用bitmap优化，但是没必要，内存够用
 static uint8_t xdata mnist_pic_large[24 * 80] = {0};
+static uint8_t xdata expression[16] = {0};
+static uint8_t xdata expression_n = 0;
+
 //
-static void parse_output(tm_mat_t *outs)
+static uint8_t parse_output(tm_mat_t *outs)
 {
 	tm_mat_t out = outs[0];
 	float *dat = (float *)out.dat;
@@ -242,7 +246,7 @@ static void parse_output(tm_mat_t *outs)
 		}
 	}
 	TM_PRINTF("### Predict output is: Number %d , Prob %.3f\r\n", maxi, maxp);
-	return;
+	return maxi;
 }
 
 void clean_mnist_pic()
@@ -257,7 +261,7 @@ void clean_mnist_pic_large()
 #define IMG_HEIGHT 24
 #define CHAR_IMG_SIZE 28
 // recognize 函数定义
-void recognize(uint32_t start_col, uint32_t end_col)
+uint8_t recognize(uint32_t start_col, uint32_t end_col)
 {
 	uint32_t col, row;
 	// printf("开始识别");
@@ -289,14 +293,11 @@ void recognize(uint32_t start_col, uint32_t end_col)
 	// 			printf("\r\n");
 	// 	}
 	// }
-	res = tm_preprocess(&mdl, TMPP_UINT2INT, &in_uint8, &in);
+	tm_preprocess(&mdl, TMPP_UINT2INT, &in_uint8, &in);
 
-	res = tm_run(&mdl, &in, outs);
+	tm_run(&mdl, &in, outs);
 
-	if (res == TM_OK)
-	{
-		parse_output(outs);
-	}
+	return parse_output(outs);
 }
 
 static tm_err_t layer_cb(tm_mdl_t *mdl, tml_head_t *lh)
@@ -441,6 +442,7 @@ void main(void)
 				int in_char = 0;		// 标记当前是否在字符区域
 				int char_count = 0;		// 字符数量计数
 				uint32_t start_col = 0; // 字符起始列
+				expression_n = 0;
 
 				for (x = 0; x < 80; x++)
 				{
@@ -468,7 +470,7 @@ void main(void)
 							uint32_t end_col;
 							in_char = 0; // 标记离开字符区域
 							end_col = x - 1;
-							recognize(start_col, end_col);
+							expression[expression_n++] = recognize(start_col, end_col);
 							// printf("字符 %d ", char_count);
 							// printf("起始列: %d,", start_col);
 							// printf("结束列: %d\n", end_col);
@@ -483,8 +485,7 @@ void main(void)
 				{
 					// 最后一个字符的结束列为图片末尾
 					uint32_t end_col = 79;
-					recognize(start_col, end_col);
-
+					expression[expression_n++] = recognize(start_col, end_col);
 					// printf("字符 %d ", char_count);
 					// printf("起始列: %d,", start_col);
 					// printf("结束列: %d\n", end_col);
@@ -494,6 +495,7 @@ void main(void)
 
 				LCD_Clear(GREEN);
 				clean_mnist_pic_large();
+				printf("计算结果: %.2f\n", expression_calc(expression, expression_n));
 			}
 		}
 
