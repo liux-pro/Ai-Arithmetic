@@ -17,6 +17,8 @@
 #include "tinymaix.h"
 #include "expression.h"
 
+#define COLLECT_MODE 0
+
 /****************  SPI初始化函数 *****************/
 void SPI_config1(void)
 {
@@ -228,6 +230,7 @@ static uint8_t xdata mnist_pic[28 * 28] = {0};
 static uint8_t xdata mnist_pic_large[24 * 80] = {0};
 static uint8_t xdata expression[16] = {0};
 static uint8_t xdata expression_n = 0;
+static uint8_t xdata strBuffer[50] = {0};
 
 //
 static uint8_t parse_output(tm_mat_t *outs)
@@ -269,7 +272,31 @@ uint8_t recognize(uint32_t start_col, uint32_t end_col)
 	// printf("结束列: %d\n", end_col);
 	if (end_col - start_col <= 1)
 	{
-		return;
+		/**
+		 * 外面只判断了一列有无数据，无法区分一个点这种干扰，和1这种很窄但是真是数字
+		 * 这里做具体判断，是点还是1
+		 */
+		uint32_t count = 0;
+
+		for (col = start_col; col <= end_col; col++)
+		{
+			for (row = 0; row < IMG_HEIGHT; row++)
+			{
+				if (mnist_pic_large[row * IMG_WIDTH + col] > 0)
+				{
+					count++;
+				}
+			}
+		}
+		if (count < 10)
+		{
+			// printf("it's a point, pass\n");
+			return;
+		}
+		else
+		{
+			// printf("still good\n");
+		}
 	}
 
 	clean_mnist_pic();
@@ -284,20 +311,25 @@ uint8_t recognize(uint32_t start_col, uint32_t end_col)
 		}
 	}
 
-	// {
-	// 	int xxx;
-	// 	for (xxx = 0; xxx < 28 * 28; xxx++)
-	// 	{
-	// 		TM_PRINTF("%3d,", mnist_pic[xxx]);
-	// 		if (xxx % 28 == 27)
-	// 			printf("\r\n");
-	// 	}
-	// }
+#if COLLECT_MODE
+	{
+		int xxx;
+		for (xxx = 0; xxx < 28 * 28; xxx++)
+		{
+			TM_PRINTF("%3d,", mnist_pic[xxx]);
+			if (xxx % 28 == 27)
+				printf("\r\n");
+		}
+		printf("@\r\n");
+	}
+	return 0;
+#else
 	tm_preprocess(&mdl, TMPP_UINT2INT, &in_uint8, &in);
 
 	tm_run(&mdl, &in, outs);
 
 	return parse_output(outs);
+#endif
 }
 
 static tm_err_t layer_cb(tm_mdl_t *mdl, tml_head_t *lh)
@@ -417,7 +449,7 @@ void main(void)
 	LCD_Init();			// 初始化LCD
 	LCD_Display_Dir(2); // 屏幕方向
 
-	LCD_Clear(GREEN);
+	LCD_Clear(WHITE);
 	configBlackLightPWM(255);
 	LCD_Set_Window(0, 0, 320, 240);
 	LCD_WriteRAM_Prepare();
@@ -493,9 +525,13 @@ void main(void)
 
 				// printf("\n字符数\xFD量: %d\n", char_count);
 
-				LCD_Clear(GREEN);
+				LCD_Clear(WHITE);
 				clean_mnist_pic_large();
-				printf("计算结果: %.2f\n", expression_calc(expression, expression_n));
+#if COLLECT_MODE
+#else
+				sprintf(strBuffer, "result: %.2f", expression_calc(expression, expression_n));
+				Show_Str(10, 200, strBuffer, 24, 0);
+#endif
 			}
 		}
 
@@ -503,6 +539,7 @@ void main(void)
 		{
 			checkISP();
 			uart_recv_done(); // 对接收的数据处理完成后,一定要调用一次这个函数,以便CDC接收下一笔串口数据
+			btn0++;
 #if TM_ENABLE_STAT
 			{
 				int xxx;
@@ -515,16 +552,6 @@ void main(void)
 				}
 			}
 #endif
-			res = tm_preprocess(&mdl, TMPP_UINT2INT, &in_uint8, &in);
-
-			res = tm_run(&mdl, &in, outs);
-
-			if (res == TM_OK)
-			{
-				parse_output(outs);
-			}
-			clean_mnist_pic();
-			LCD_Clear(GREEN);
 		}
 
 		if (touch_scan())
@@ -545,6 +572,13 @@ void main(void)
 					LCD_Fill(x, y, x + 4, y + 4, BLACK);
 					mnist_pic_large[(x / 4) + (y / 4) * 80] = 255;
 				}
+			}
+
+			// 这里没考虑边缘越界，但是好像没事
+
+			if (y > 24 * 4)
+			{
+				btn0++;
 			}
 		}
 	}
