@@ -1,6 +1,7 @@
 .idea
 .venv
 mnist
+mnist_fine_tuning
 qmnist
 myimage
 dml
