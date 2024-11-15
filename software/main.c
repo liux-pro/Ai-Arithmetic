@@ -17,6 +17,8 @@
 #include "tinymaix.h"
 #include "expression.h"
 
+#define COLLECT_MODE 0
+
 /****************  SPI初始化函数 *****************/
 void SPI_config1(void)
 {
@@ -52,6 +54,12 @@ void checkISP()
 
 char putchar(char c)
 {
+	// 如果usb没有连接，发送会卡住，这里检查是否连接再发送
+	if (DeviceState != DEVSTATE_CONFIGURED)
+	{
+		return;
+	}
+
 	// 无优化，这样打印会很慢
 	TxBuffer[0] = c;
 	uart_send(1);
@@ -165,8 +173,8 @@ u16 remap(u16 adc_value, u16 adc_min, u16 adc_max, u16 output_min, u16 output_ma
 	return output_min + normalized;
 }
 
-#define SAMP_CNT 4
-#define SAMP_CNT_DIV2 2
+#define SAMP_CNT 8
+#define SAMP_CNT_DIV2 4
 u16 X, Y;
 // 抄的adc滤波代码  https://www.cnblogs.com/yuphone/archive/2010/11/28/1890239.html
 // 用adc测量电阻屏按压位置
@@ -228,6 +236,7 @@ static uint8_t xdata mnist_pic[28 * 28] = {0};
 static uint8_t xdata mnist_pic_large[24 * 80] = {0};
 static uint8_t xdata expression[16] = {0};
 static uint8_t xdata expression_n = 0;
+static uint8_t xdata strBuffer[50] = {0};
 
 //
 static uint8_t parse_output(tm_mat_t *outs)
@@ -260,44 +269,116 @@ void clean_mnist_pic_large()
 #define IMG_WIDTH 80
 #define IMG_HEIGHT 24
 #define CHAR_IMG_SIZE 28
+#define BAD_RECOGNIZE 255
 // recognize 函数定义
 uint8_t recognize(uint32_t start_col, uint32_t end_col)
 {
 	uint32_t col, row;
-	// printf("开始识别");
-	// printf("起始列: %d,", start_col);
-	// printf("结束列: %d\n", end_col);
-	if (end_col - start_col <= 1)
+	uint32_t top_row, bottom_row;
+	uint32_t hor_offset, ver_offset;
+	uint32_t effective_height;
+
+	// 处理宽度只有一列的情况，区分点和有效字符
+	if (end_col - start_col <= 3)
 	{
-		return;
+		uint32_t count = 0;
+		for (col = start_col; col <= end_col; col++)
+		{
+			for (row = 0; row < IMG_HEIGHT; row++)
+			{
+				if (mnist_pic_large[row * IMG_WIDTH + col] > 0)
+				{
+					count++;
+				}
+			}
+		}
+
+		if (count < 10)
+		{
+			return BAD_RECOGNIZE; // 认为是干扰点，跳过
+		}
 	}
 
 	clean_mnist_pic();
 
-	// 分割字符区域并扩展到 28x28 大小
+	// 计算水平偏移量
+	hor_offset = (CHAR_IMG_SIZE - (end_col - start_col + 1)) / 2;
+
+	// 计算有效的字符高度范围
+	top_row = IMG_HEIGHT;
+	bottom_row = 0;
+	for (row = 0; row < IMG_HEIGHT; row++)
+	{
+		for (col = start_col; col <= end_col; col++)
+		{
+			if (mnist_pic_large[row * IMG_WIDTH + col] > 0)
+			{
+				if (row < top_row)
+					top_row = row;
+				if (row > bottom_row)
+					bottom_row = row;
+			}
+		}
+	}
+
+	// 计算有效字符区域的高度
+	effective_height = bottom_row - top_row + 1;
+
+	// 计算垂直偏移量（基于有效高度居中）
+	ver_offset = (CHAR_IMG_SIZE - effective_height) / 2;
+
+	// 分割字符区域并扩展到 28x28 大小，居中处理
 	for (col = start_col; col <= end_col; col++)
 	{
 		for (row = 0; row < IMG_HEIGHT; row++)
 		{
-			// 将字符区域扩展到 28x28 大小
-			mnist_pic[(row + (CHAR_IMG_SIZE - IMG_HEIGHT) / 2) * CHAR_IMG_SIZE + (col - start_col + (CHAR_IMG_SIZE - (end_col - start_col + 1)) / 2)] = mnist_pic_large[row * IMG_WIDTH + col];
+			if (mnist_pic_large[row * IMG_WIDTH + col] > 0)
+			{
+				// 将字符区域扩展到 28x28 大小并居中
+				uint32_t new_col = col - start_col + hor_offset;
+				uint32_t new_row = row - top_row + ver_offset;
+
+				// 如果字符高度和位置不适合居中，进行调整
+				if (new_row < 0)
+				{
+					new_row = 0;
+				}
+				else if (new_row >= CHAR_IMG_SIZE)
+				{
+					new_row = CHAR_IMG_SIZE - 1;
+				}
+
+				mnist_pic[new_row * CHAR_IMG_SIZE + new_col] = mnist_pic_large[row * IMG_WIDTH + col];
+			}
 		}
 	}
 
-	// {
-	// 	int xxx;
-	// 	for (xxx = 0; xxx < 28 * 28; xxx++)
-	// 	{
-	// 		TM_PRINTF("%3d,", mnist_pic[xxx]);
-	// 		if (xxx % 28 == 27)
-	// 			printf("\r\n");
-	// 	}
-	// }
-	tm_preprocess(&mdl, TMPP_UINT2INT, &in_uint8, &in);
+#if COLLECT_MODE
+	{
+		int xxx;
+		for (xxx = 0; xxx < 28 * 28; xxx++)
+		{
+			TM_PRINTF("%3d,", mnist_pic[xxx]);
+			if (xxx % 28 == 27)
+				printf("\r\n");
+		}
+		printf("@\r\n");
+	}
+	return 0;
+#else
+	{
+		// uint32_t xx;
+		// printf("@");
+		// for (xx = 0; xx < 300; xx++)
+		// {
+		tm_preprocess(&mdl, TMPP_UINT2INT, &in_uint8, &in);
 
-	tm_run(&mdl, &in, outs);
-
+		tm_run(&mdl, &in, outs);
+		// }
+		// printf("!");
+	}
 	return parse_output(outs);
+#endif
 }
 
 static tm_err_t layer_cb(tm_mdl_t *mdl, tml_head_t *lh)
@@ -417,7 +498,7 @@ void main(void)
 	LCD_Init();			// 初始化LCD
 	LCD_Display_Dir(2); // 屏幕方向
 
-	LCD_Clear(GREEN);
+	LCD_Clear(WHITE);
 	configBlackLightPWM(255);
 	LCD_Set_Window(0, 0, 320, 240);
 	LCD_WriteRAM_Prepare();
@@ -468,9 +549,14 @@ void main(void)
 						if (in_char)
 						{
 							uint32_t end_col;
+							uint8_t temp;
 							in_char = 0; // 标记离开字符区域
 							end_col = x - 1;
-							expression[expression_n++] = recognize(start_col, end_col);
+							temp = recognize(start_col, end_col);
+							if (temp != BAD_RECOGNIZE)
+							{
+								expression[expression_n++] = temp;
+							}
 							// printf("字符 %d ", char_count);
 							// printf("起始列: %d,", start_col);
 							// printf("结束列: %d\n", end_col);
@@ -485,7 +571,12 @@ void main(void)
 				{
 					// 最后一个字符的结束列为图片末尾
 					uint32_t end_col = 79;
-					expression[expression_n++] = recognize(start_col, end_col);
+					uint8_t temp;
+
+					if (temp != BAD_RECOGNIZE)
+					{
+						expression[expression_n++] = temp;
+					}
 					// printf("字符 %d ", char_count);
 					// printf("起始列: %d,", start_col);
 					// printf("结束列: %d\n", end_col);
@@ -493,9 +584,13 @@ void main(void)
 
 				// printf("\n字符数\xFD量: %d\n", char_count);
 
-				LCD_Clear(GREEN);
+				LCD_Clear(WHITE);
 				clean_mnist_pic_large();
-				printf("计算结果: %.2f\n", expression_calc(expression, expression_n));
+#if COLLECT_MODE
+#else
+				sprintf(strBuffer, "result: %.2f", expression_calc(expression, expression_n));
+				Show_Str(10, 200, strBuffer, 24, 0);
+#endif
 			}
 		}
 
@@ -503,6 +598,7 @@ void main(void)
 		{
 			checkISP();
 			uart_recv_done(); // 对接收的数据处理完成后,一定要调用一次这个函数,以便CDC接收下一笔串口数据
+			btn0++;
 #if TM_ENABLE_STAT
 			{
 				int xxx;
@@ -515,16 +611,6 @@ void main(void)
 				}
 			}
 #endif
-			res = tm_preprocess(&mdl, TMPP_UINT2INT, &in_uint8, &in);
-
-			res = tm_run(&mdl, &in, outs);
-
-			if (res == TM_OK)
-			{
-				parse_output(outs);
-			}
-			clean_mnist_pic();
-			LCD_Clear(GREEN);
 		}
 
 		if (touch_scan())
@@ -545,6 +631,13 @@ void main(void)
 					LCD_Fill(x, y, x + 4, y + 4, BLACK);
 					mnist_pic_large[(x / 4) + (y / 4) * 80] = 255;
 				}
+			}
+
+			// 这里没考虑边缘越界，但是好像没事
+
+			if (y > 24 * 4)
+			{
+				btn0++;
 			}
 		}
 	}
