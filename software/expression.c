@@ -7,7 +7,7 @@
 // 用栈处理运算符优先级
 typedef struct {
     float _data[MAX_SIZE];  // 使用 float 类型以支持浮点数
-    int top;
+    int32_t top;
 } Stack;
 
 static void push(Stack *stack, float value) {
@@ -30,7 +30,7 @@ static float peek(Stack *stack) {
     return 0.0f;
 }
 
-static int getPriority(uint8_t op) {
+static int32_t getPriority(uint8_t op) {
     if (op == 10 || op == 11) { // 加法和减法
         return 1;
     }
@@ -57,7 +57,7 @@ float expression_calc(uint8_t item[], uint8_t n) {
         // 如果当前是数字 (0-9)，可能是多位数的一部分
         if (current >= 0 && current <= 9) {
             // 处理连续的数字组成多位数
-            int number = current;
+            int32_t number = current;
             i++;
             while (i < n && item[i] >= 0 && item[i] <= 9) {
                 number = number * 10 + item[i];
