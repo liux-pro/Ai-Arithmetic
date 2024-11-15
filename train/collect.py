@@ -4,13 +4,13 @@ from PIL import Image
 import os
 
 # 设置串口
-ser = serial.Serial('COM8', 9600, timeout=1)  # 根据实际串口号修改
+ser = serial.Serial('COM9', 9600, timeout=1)  # 根据实际串口号修改
 
 # 设置图像的大小和通道
 height, width = 28, 28
 
 # 设置文件保存路径
-save_path = './dataset/mymnist14/13/'
+save_path = './dataset/mymnist14/4/'
 
 # 获取最大文件索引
 def get_next_file_index():
