@@ -299,7 +299,6 @@ void check_boot()
 	P3PU &= ~0x04;
 }
 
-int8 btn0;
 void interrupt0()
 // 用这个判断是否位keil编译器，避免vscode里不认keil语法报错
 // https://developer.arm.com/documentation/101655/0961/Cx51-User-s-Guide/Preprocessor/Macros/Predefined-Macros
@@ -307,9 +306,11 @@ void interrupt0()
 	interrupt INT0_VECTOR
 #endif
 {
-	btn0++;
+	//这个按钮没啥用，姑且配置为按下进下载模式
+	check_boot();
 }
 
+int8 btn0;
 void main(void)
 {
 
@@ -331,6 +332,8 @@ void main(void)
 	check_boot();
 
 	{
+		// 配置boot按钮用作正常按钮
+		// 按下后会进入外部中断 interrupt0
 		// P3.2(interrupt 0)准双向
 		P3M0 &= ~0x04;
 		P3M1 &= ~0x04;
