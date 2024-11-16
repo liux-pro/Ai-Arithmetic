@@ -48,7 +48,15 @@ char putchar(char c)
 	{
 		return;
 	}
-
+	
+	// 如果usb已连接，但电脑上没有打开该串口，这时发送也会卡住
+	// 观察到在win11上，打开串口后，CDC_DTR会变成1，反之为0
+	// 不知道这个行为能否推广到其他系统。
+	if (CDC_DTR==0)
+	{
+		return;
+	}
+	
 	// 无优化，这样打印会很慢
 	TxBuffer[0] = c;
 	uart_send(1);

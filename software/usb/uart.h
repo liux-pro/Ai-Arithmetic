@@ -9,6 +9,10 @@ void uart_init();
 void uart_recv_done();
 void uart_send(int size);
 
+//Ö»¶Á
+extern BOOL CDC_DTR;
+//Ö»¶Á
+extern BOOL CDC_RTS;
 
 extern BOOL RxFlag;
 extern BYTE RxCount;

@@ -15,6 +15,9 @@
 #include "uart.h"
 #include "usb.h"
 
+BOOL CDC_DTR;
+BOOL CDC_RTS;
+
 //当RxFlag为1时,表示已接收到CDC串口数据
 //接收的数据大小保存在RxCount里面,每个包最多接收64字节
 //数据保存在RxBuffer缓冲区

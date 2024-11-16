@@ -2,6 +2,7 @@
 #include "usb.h"
 #include "usb_req_class.h"
 #include "util.h"
+#include "uart.h"
 
 LINECODING LineCoding;
 
@@ -66,6 +67,8 @@ void usb_set_ctrl_line_state()
     //可以从这里读取DTR和RTS的状态
     // Setup.wValueL&0x01	//DTR
     // Setup.wValueL&0x02	//RTS
+    CDC_DTR=!!(Setup.wValueL&0x01);
+	CDC_RTS=!!(Setup.wValueL&0x02);
 	
     usb_setup_status();
 }
