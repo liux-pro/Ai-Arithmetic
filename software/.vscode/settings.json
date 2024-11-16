@@ -12,7 +12,12 @@
         "stc32g_clock.h": "c",
         "stc32g_nvic.h": "c",
         "uart.h": "c",
-        "backlight.h": "c"
+        "backlight.h": "c",
+        "string.h": "c",
+        "ai.h": "c",
+        "canvas.h": "c",
+        "tinymaix.h": "c",
+        "stdint.h": "c"
     },
     "files.encoding": "gb2312"
 }

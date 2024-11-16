@@ -350,14 +350,19 @@
               <FilePath>.\touch.h</FilePath>
             </File>
             <File>
-              <FileName>tinymaix_helper.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\tinymaix_helper.c</FilePath>
-            </File>
-            <File>
               <FileName>backLight.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\backLight.c</FilePath>
+            </File>
+            <File>
+              <FileName>Ai.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Ai.c</FilePath>
+            </File>
+            <File>
+              <FileName>canvas.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\canvas.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -570,44 +575,9 @@
           <GroupName>TinyMaix</GroupName>
           <Files>
             <File>
-              <FileName>arch_arm_neon.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\TinyMaix\arch_arm_neon.h</FilePath>
-            </File>
-            <File>
-              <FileName>arch_arm_simd.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\TinyMaix\arch_arm_simd.h</FilePath>
-            </File>
-            <File>
               <FileName>arch_cpu.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\TinyMaix\arch_cpu.h</FilePath>
-            </File>
-            <File>
-              <FileName>mbnet96_0.25_q.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\TinyMaix\mbnet96_0.25_q.h</FilePath>
-            </File>
-            <File>
-              <FileName>mnist_q_valid.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\TinyMaix\mnist_q_valid.h</FilePath>
-            </File>
-            <File>
-              <FileName>mnist_valid_q_be.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\TinyMaix\mnist_valid_q_be.h</FilePath>
-            </File>
-            <File>
-              <FileName>pic96.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\TinyMaix\pic96.h</FilePath>
-            </File>
-            <File>
-              <FileName>pic128.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\TinyMaix\pic128.h</FilePath>
             </File>
             <File>
               <FileName>tinymaix.h</FileName>
@@ -618,11 +588,6 @@
               <FileName>tm_layers.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\TinyMaix\tm_layers.c</FilePath>
-            </File>
-            <File>
-              <FileName>tm_layers_O1.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\TinyMaix\tm_layers_O1.c</FilePath>
             </File>
             <File>
               <FileName>tm_model.c</FileName>
@@ -638,11 +603,6 @@
               <FileName>tm_stat.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\TinyMaix\tm_stat.c</FilePath>
-            </File>
-            <File>
-              <FileName>vww96_q.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\TinyMaix\vww96_q.h</FilePath>
             </File>
           </Files>
         </Group>
