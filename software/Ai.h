@@ -3,13 +3,14 @@
 #include "tinymaix.h"
 
 
-#define IMG_WIDTH 80
-#define IMG_HEIGHT 24
+#define CANVAS_WIDTH 80
+#define CANVAS_HEIGHT 24
 #define CHAR_IMG_SIZE 28
-#define BAD_RECOGNIZE 255
 
-#define IMG_L (28)
-#define IMG_CH (1)
+#define IMAGE_WIDTH (28)
+#define IMAGE_HEIGHT (28)
+
+#define IMAGE_CHANNEL (1)
 #define CLASS_N (14)
 
 void Ai_init();

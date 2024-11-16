@@ -3,7 +3,9 @@
 #include "stdint.h"
 #include "stdbool.h"
 
-extern uint8_t xdata canvas[24 * 80];
+#define COLLECT_MODE 0
+
+extern uint8_t xdata canvas[CANVAS_HEIGHT * CANVAS_WIDTH];
 
 bool canvas_process_character(uint32_t start_col, uint32_t end_col);
 void clean_canvas();

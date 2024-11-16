@@ -17,7 +17,6 @@
 #include "Ai.h"
 #include "canvas.h"
 
-#define COLLECT_MODE 0
 uint8_t xdata expression[16] = {0};
 uint8_t xdata expression_n = 0;
 static uint8_t xdata strBuffer[50] = {0};
@@ -160,12 +159,12 @@ void main(void)
 				uint32_t start_col = 0; // 字符起始列
 				expression_n = 0;
 
-				for (x = 0; x < 80; x++)
+				for (x = 0; x < CANVAS_WIDTH; x++)
 				{
 					sum = 0;
-					for (y = 0; y < 24; y++)
+					for (y = 0; y < CANVAS_HEIGHT; y++)
 					{
-						sum |= canvas[y * 80 + x];
+						sum |= canvas[y * CANVAS_WIDTH + x];
 					}
 
 					if (sum)
@@ -204,7 +203,7 @@ void main(void)
 				if (in_char)
 				{
 					// 最后一个字符的结束列为图片末尾
-					uint32_t end_col = 79;
+					uint32_t end_col = CANVAS_WIDTH-1;
 
 					if (canvas_process_character(start_col, end_col))
 					{
@@ -219,11 +218,9 @@ void main(void)
 
 				LCD_Clear(WHITE);
 				clean_canvas();
-#if COLLECT_MODE
-#else
+				
 				sprintf(strBuffer, "result: %.2f", expression_calc(expression, expression_n));
 				Show_Str(10, 200, strBuffer, 24, 0);
-#endif
 			}
 		}
 
@@ -233,14 +230,7 @@ void main(void)
 			uart_recv_done(); // 对接收的数据处理完成后,一定要调用一次这个函数,以便CDC接收下一笔串口数据
 #if TM_ENABLE_STAT
 			{
-				int xxx;
 				tm_stat((tm_mdlbin_t *)mdl_data);
-				for (xxx = 0; xxx < 28 * 28; xxx++)
-				{
-					TM_PRINTF("%3d,", input_image[xxx]);
-					if (xxx % 28 == 27)
-						printf("\r\n");
-				}
 			}
 #endif
 		}
@@ -256,16 +246,16 @@ void main(void)
 			}
 
 			// 这里没考虑边缘越界，但是好像没事
-			if (x > 0 && x < 80 * 4)
+			if (x > 0 && x < CANVAS_WIDTH * 4)
 			{
-				if (y > 0 && y < 24 * 4)
+				if (y > 0 && y < CANVAS_HEIGHT * 4)
 				{
 					LCD_Fill(x, y, x + 4, y + 4, BLACK);
-					canvas[(x / 4) + (y / 4) * 80] = 255;
+					canvas[(x / 4) + (y / 4) * CANVAS_WIDTH] = 255;
 				}
 			}
 
-			if (y > 24 * 4)
+			if (y > CANVAS_HEIGHT * 4)
 			{
 				btn0++;
 			}

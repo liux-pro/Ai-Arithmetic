@@ -6,7 +6,7 @@
 #include "model.h"
 
 uint8_t xdata mdl_buf[MDL_BUF_LEN];
-uint8_t xdata input_image[28 * 28] = {0};
+uint8_t xdata input_image[IMAGE_WIDTH * IMAGE_HEIGHT] = {0};
 // 这里可以用bitmap优化，但是没必要，内存够用
 
 tm_mdl_t mdl;
@@ -53,7 +53,7 @@ static tm_err_t layer_cb(tm_mdl_t *mdl, tml_head_t *lh)
 
 void clean_input_image()
 {
-	memset(input_image, 0, 28 * 28 * sizeof(input_image[0]));
+	memset(input_image, 0, IMAGE_WIDTH * IMAGE_HEIGHT * sizeof(input_image[0]));
 }
 
 // 处理模型输出的结果，返回识别出的数字
@@ -72,22 +72,22 @@ uint8_t parse_output(tm_mat_t *outs)
 			maxp = dat[i];
 		}
 	}
-	TM_PRINTF("### Predict output is: Number %d , Prob %.3f\r\n", maxi, maxp);
+	// TM_PRINTF("### Predict output is: Number %d , Prob %.3f\r\n", maxi, maxp);
 	return maxi;
 }
 
 void Ai_init()
 {
 	in_uint8.dims = 3;
-	in_uint8.h = IMG_L;
-	in_uint8.w = IMG_L;
-	in_uint8.c = IMG_CH;
+	in_uint8.h = IMAGE_HEIGHT;
+	in_uint8.w = IMAGE_WIDTH;
+	in_uint8.c = IMAGE_CHANNEL;
 	in_uint8.dat = (mtype_t *)input_image;
 
 	in.dims = 3;
-	in.h = IMG_L;
-	in.w = IMG_L;
-	in.c = IMG_CH;
+	in.h = IMAGE_HEIGHT;
+	in.w = IMAGE_WIDTH;
+	in.c = IMAGE_CHANNEL;
 	in.dat = NULL;
 
 	res = tm_load(&mdl, mdl_data, mdl_buf, layer_cb, &in);

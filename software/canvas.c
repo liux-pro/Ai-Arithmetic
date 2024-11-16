@@ -2,14 +2,12 @@
 #include "Ai.h"
 #include "canvas.h"
 
-
-extern uint8_t xdata input_image[28 * 28];
-
-uint8_t xdata canvas[24 * 80] = {0};
+extern uint8_t xdata input_image[IMAGE_WIDTH * IMAGE_HEIGHT];
+uint8_t xdata canvas[CANVAS_HEIGHT * CANVAS_WIDTH] = {0};
 
 void clean_canvas()
 {
-    memset(canvas, 0, 24 * 80 * sizeof(canvas[0]));
+    memset(canvas, 0, CANVAS_HEIGHT * CANVAS_WIDTH * sizeof(canvas[0]));
 }
 
 // 给出一个字符在canvas中起始列，分割这个字符,居中放入input_image，保证四边空白部分等宽
@@ -26,9 +24,9 @@ bool canvas_process_character(uint32_t start_col, uint32_t end_col)
         uint32_t count = 0;
         for (col = start_col; col <= end_col; col++)
         {
-            for (row = 0; row < IMG_HEIGHT; row++)
+            for (row = 0; row < CANVAS_HEIGHT; row++)
             {
-                if (canvas[row * IMG_WIDTH + col] > 0)
+                if (canvas[row * CANVAS_WIDTH + col] > 0)
                 {
                     count++;
                 }
@@ -47,13 +45,13 @@ bool canvas_process_character(uint32_t start_col, uint32_t end_col)
     hor_offset = (CHAR_IMG_SIZE - (end_col - start_col + 1)) / 2;
 
     // 计算有效的字符高度范围
-    top_row = IMG_HEIGHT;
+    top_row = CANVAS_HEIGHT;
     bottom_row = 0;
-    for (row = 0; row < IMG_HEIGHT; row++)
+    for (row = 0; row < CANVAS_HEIGHT; row++)
     {
         for (col = start_col; col <= end_col; col++)
         {
-            if (canvas[row * IMG_WIDTH + col] > 0)
+            if (canvas[row * CANVAS_WIDTH + col] > 0)
             {
                 if (row < top_row)
                     top_row = row;
@@ -72,9 +70,9 @@ bool canvas_process_character(uint32_t start_col, uint32_t end_col)
     // 分割字符区域并扩展到 28x28 大小，居中处理
     for (col = start_col; col <= end_col; col++)
     {
-        for (row = 0; row < IMG_HEIGHT; row++)
+        for (row = 0; row < CANVAS_HEIGHT; row++)
         {
-            if (canvas[row * IMG_WIDTH + col] > 0)
+            if (canvas[row * CANVAS_WIDTH + col] > 0)
             {
                 // 将字符区域扩展到 28x28 大小并居中
                 uint32_t new_col = col - start_col + hor_offset;
@@ -90,9 +88,21 @@ bool canvas_process_character(uint32_t start_col, uint32_t end_col)
                     new_row = CHAR_IMG_SIZE - 1;
                 }
 
-                input_image[new_row * CHAR_IMG_SIZE + new_col] = canvas[row * IMG_WIDTH + col];
+                input_image[new_row * CHAR_IMG_SIZE + new_col] = canvas[row * CANVAS_WIDTH + col];
             }
         }
     }
+#if COLLECT_MODE
+    {
+        int xxx;
+        for (xxx = 0; xxx < IMAGE_WIDTH * IMAGE_HEIGHT; xxx++)
+        {
+            printf("%3d,", input_image[xxx]);
+            if (xxx % IMAGE_WIDTH == IMAGE_WIDTH - 1)
+                printf("\r\n");
+        }
+        printf("@\r\n");
+    }
+#endif
     return true;
 }
