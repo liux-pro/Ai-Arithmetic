@@ -4,7 +4,9 @@ on:
   push:
     branches:
       - master  # 可以修改为你想要触发的分支
-
+    paths:
+      - 'train/**'
+    workflow_dispatch: # 添加手动触发按钮
 jobs:
   run_notebook:
     runs-on: ubuntu-latest  # 使用最新的 Ubuntu 环境
