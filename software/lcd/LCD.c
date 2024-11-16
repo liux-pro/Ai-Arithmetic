@@ -250,6 +250,11 @@ void Set_GPIO(void)
 //初始化lcd
 void LCD_Init(void)
 {
+	P2_MODE_IO_PU(GPIO_Pin_5 | GPIO_Pin_7);
+	P0_MODE_IO_PU(GPIO_Pin_5);
+	P5_MODE_IO_PU(GPIO_Pin_1);
+	P2_SPEED_HIGH(GPIO_Pin_5 | GPIO_Pin_7); // 电平转换速度快（提高IO口翻转速度）
+	P2_DRIVE_HIGH(GPIO_Pin_5 | GPIO_Pin_7);
 	
 	SPI_RST=1;
 	delay_ms(10);

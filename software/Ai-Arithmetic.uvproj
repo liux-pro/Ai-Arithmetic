@@ -339,6 +339,16 @@
               <FileType>5</FileType>
               <FilePath>.\expression.h</FilePath>
             </File>
+            <File>
+              <FileName>touch.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\touch.c</FilePath>
+            </File>
+            <File>
+              <FileName>touch.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\touch.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
