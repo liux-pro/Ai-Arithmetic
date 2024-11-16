@@ -364,6 +364,11 @@
               <FileType>1</FileType>
               <FilePath>.\canvas.c</FilePath>
             </File>
+            <File>
+              <FileName>delay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\delay.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -543,31 +548,6 @@
               <FileName>LCD.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\lcd\LCD.h</FilePath>
-            </File>
-            <File>
-              <FileName>pic.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\lcd\pic.h</FilePath>
-            </File>
-            <File>
-              <FileName>sys.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\lcd\sys.c</FilePath>
-            </File>
-            <File>
-              <FileName>sys.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\lcd\sys.h</FilePath>
-            </File>
-            <File>
-              <FileName>test code.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\lcd\test code.c</FilePath>
-            </File>
-            <File>
-              <FileName>test code.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\lcd\test code.h</FilePath>
             </File>
           </Files>
         </Group>

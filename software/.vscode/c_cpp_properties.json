@@ -19,6 +19,7 @@
                 "bdata=",
                 "pdata=",
                 "xdata=",
+                "edata=",
                 "code=",
                 "interrupt=",
                 "far=",

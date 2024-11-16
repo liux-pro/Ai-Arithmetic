@@ -4,7 +4,6 @@
 #include "uart.h"
 #include "STC32G_GPIO.h"
 #include "LCD.h"
-#include "test code.h"
 #include "STC32G_SPI.h"
 #include "STC32G_Switch.h"
 #include "STC32G_NVIC.h"

@@ -1,10 +1,10 @@
 #include "lcd.h"
 #include "stdlib.h"
 #include "font.h" 
-#include "sys.h"
 #include "string.h"
 #include "STC32G.h"
-#include	"STC32G_SPI.h"
+#include "STC32G_SPI.h"
+#include "STC32G_GPIO.h"
 
 //LCD的画笔颜色和背景色	   
 u16 POINT_COLOR=0x0000;	//画笔颜色

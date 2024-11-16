@@ -17,7 +17,8 @@
         "ai.h": "c",
         "canvas.h": "c",
         "tinymaix.h": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "sys.h": "c"
     },
     "files.encoding": "gb2312"
 }

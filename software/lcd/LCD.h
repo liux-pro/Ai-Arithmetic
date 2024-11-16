@@ -1,17 +1,8 @@
 #ifndef __LCD_H
 #define __LCD_H		
-#include "sys.h"	
+#include "common.h"
+#include "delay.h"	
 
-
-	 
-/////////////////////////////////////用户配置区///////////////////////////////////	 
-//支持横竖屏快速定义切换
-#define USE_LCM_DIR  	  3   	//定义液晶屏顺时针旋转方向 	0-0度旋转，1-180度旋转，2-270度旋转，3-90度旋转
-#define USE_TP_TYPE   	RTP 	//定义触摸类型  CTP = 电容模式 , RTP = 电阻模式
-
-#define CTP 0X80		//电容模式
-#define RTP 0X00		//电阻模式	 
-	 
 	 
 //LCD重要参数集
 typedef struct  
@@ -148,9 +139,6 @@ void LCD_Display_Dir(u8 dir); //设置LCD显示方向
 void lcd_draw_bline(u16 x1, u16 y1, u16 x2, u16 y2,u8 size,u16 color);//画一条粗线
 void gui_fill_circle(u16 x0,u16 y0,u16 r,u16 color);//画实心圆
 void gui_draw_hline(u16 x0,u16 y0,u16 len,u16 color);//画水平线 电容触摸屏专有部分
-//u16 LCD_ReadPoint(u16 x,u16 y);//读取指定坐标颜色
-
-
 
 #endif
 
