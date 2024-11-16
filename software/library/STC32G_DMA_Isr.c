@@ -271,31 +271,31 @@ void DMA_UART4RX_ISR_Handler (void) interrupt DMA_UR4R_VECTOR
 // 返回: none.
 // 版本: V1.0, 2022-03-23
 //========================================================================
-void DMA_SPI_ISR_Handler (void) interrupt DMA_SPI_VECTOR
-{
-	// TODO: 在此处添加用户代码
-	if(DMA_SPI_STA & 0x01)	//通信完成
-	{
-		DMA_SPI_STA &= ~0x01;	//清标志位
-		if(MSTR) 
-		{ //主机模式
-			SpiTxFlag = 1;
-			SPI_SS_2 = 1;
-		}
-		else 
-		{ //从机模式
-			SpiRxFlag = 1;
-		}
-	}
-	if(DMA_SPI_STA & 0x02)	//数据丢弃
-	{
-		DMA_SPI_STA &= ~0x02;	//清标志位
-	}
-	if(DMA_SPI_STA & 0x04)	//数据覆盖
-	{
-		DMA_SPI_STA &= ~0x04;	//清标志位
-	}
-}
+// void DMA_SPI_ISR_Handler (void) interrupt DMA_SPI_VECTOR
+// {
+// 	// TODO: 在此处添加用户代码
+// 	if(DMA_SPI_STA & 0x01)	//通信完成
+// 	{
+// 		DMA_SPI_STA &= ~0x01;	//清标志位
+// 		if(MSTR) 
+// 		{ //主机模式
+// 			SpiTxFlag = 1;
+// 			SPI_SS_2 = 1;
+// 		}
+// 		else 
+// 		{ //从机模式
+// 			SpiRxFlag = 1;
+// 		}
+// 	}
+// 	if(DMA_SPI_STA & 0x02)	//数据丢弃
+// 	{
+// 		DMA_SPI_STA &= ~0x02;	//清标志位
+// 	}
+// 	if(DMA_SPI_STA & 0x04)	//数据覆盖
+// 	{
+// 		DMA_SPI_STA &= ~0x04;	//清标志位
+// 	}
+// }
 
 //========================================================================
 // 函数: DMA_I2C_ISR_Handler

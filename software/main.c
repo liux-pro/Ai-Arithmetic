@@ -214,8 +214,9 @@ void main(void)
 				}
 
 				// printf("\n×Ö·ûÊý\xFDÁ¿: %d\n", char_count);
+	// LCD_Fill(0, 0, 320, 240, BLUE);
 
-				LCD_Clear(WHITE);
+				LCD_Clear(BLUE);
 				clean_canvas();
 				
 				sprintf(strBuffer, "result: %.2f", expression_calc(expression, expression_n));
