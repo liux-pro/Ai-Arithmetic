@@ -349,6 +349,16 @@
               <FileType>5</FileType>
               <FilePath>.\touch.h</FilePath>
             </File>
+            <File>
+              <FileName>tinymaix_helper.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\tinymaix_helper.c</FilePath>
+            </File>
+            <File>
+              <FileName>backLight.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\backLight.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

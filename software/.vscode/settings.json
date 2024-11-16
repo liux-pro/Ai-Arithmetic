@@ -8,7 +8,11 @@
         "expression.h": "c",
         "stc32g_gpio.h": "c",
         "common.h": "c",
-        "touch.h": "c"
+        "touch.h": "c",
+        "stc32g_clock.h": "c",
+        "stc32g_nvic.h": "c",
+        "uart.h": "c",
+        "backlight.h": "c"
     },
     "files.encoding": "gb2312"
 }
