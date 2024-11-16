@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "stc32g.h": "c",
+        "mnist_valid_q_be.h": "c",
+        "stdio.h": "c",
+        "STC32G.H": "c",
+        "usb.h": "c",
+        "expression.h": "c",
+        "stc32g_gpio.h": "c",
+        "common.h": "c",
+        "touch.h": "c"
+    },
+    "files.encoding": "gb2312"
+}
