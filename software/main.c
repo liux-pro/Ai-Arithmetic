@@ -196,7 +196,7 @@ void main(void)
 				if (in_char)
 				{
 					// 最后一个字符的结束列为图片末尾
-					uint32_t end_col = CANVAS_WIDTH-1;
+					uint32_t end_col = CANVAS_WIDTH - 1;
 
 					if (canvas_process_character(start_col, end_col))
 					{
@@ -208,11 +208,11 @@ void main(void)
 				}
 
 				// printf("\n字符数\xFD量: %d\n", char_count);
-	// LCD_Fill(0, 0, 320, 240, BLUE);
+				// LCD_Fill(0, 0, 320, 240, BLUE);
 
 				LCD_Clear(BLUE);
 				clean_canvas();
-				
+
 				sprintf(strBuffer, "result: %.2f", expression_calc(expression, expression_n));
 				Show_Str(10, 200, strBuffer, 24, 0);
 			}

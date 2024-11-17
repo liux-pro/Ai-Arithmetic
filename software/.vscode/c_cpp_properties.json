@@ -3,8 +3,14 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**",
-                "D:\\Software\\KeilC251\\C251\\INC\\**"
+                "${workspaceFolder}/",
+                "${workspaceFolder}/lcd",
+                "${workspaceFolder}/TinyMaix",
+                "${workspaceFolder}/usb",
+                "${workspaceFolder}/library",
+                "${workspaceFolder}/",
+                "D:\\Software\\KeilC251\\C251\\INC",
+                "D:\\Software\\KeilC251\\C251\\INC\\STC"
             ],
             "defines": [
                 "_DEBUG",
