@@ -375,85 +375,15 @@
           <GroupName>library</GroupName>
           <Files>
             <File>
-              <FileName>STC32G_GPIO.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\library\STC32G_GPIO.c</FilePath>
-            </File>
-            <File>
-              <FileName>STC32G_GPIO.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\library\STC32G_GPIO.h</FilePath>
-            </File>
-            <File>
-              <FileName>STC32G_ADC.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\library\STC32G_ADC.c</FilePath>
-            </File>
-            <File>
-              <FileName>STC32G_ADC.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\library\STC32G_ADC.h</FilePath>
-            </File>
-            <File>
-              <FileName>config.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\library\config.h</FilePath>
-            </File>
-            <File>
-              <FileName>STC32G_Clock.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\library\STC32G_Clock.c</FilePath>
-            </File>
-            <File>
-              <FileName>STC32G_Clock.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\library\STC32G_Clock.h</FilePath>
-            </File>
-            <File>
-              <FileName>STC32G_NVIC.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\library\STC32G_NVIC.c</FilePath>
-            </File>
-            <File>
-              <FileName>STC32G_NVIC.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\library\STC32G_NVIC.h</FilePath>
-            </File>
-            <File>
-              <FileName>STC32G_SPI.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\library\STC32G_SPI.c</FilePath>
-            </File>
-            <File>
-              <FileName>STC32G_SPI.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\library\STC32G_SPI.h</FilePath>
-            </File>
-            <File>
-              <FileName>STC32G_Switch.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\library\STC32G_Switch.h</FilePath>
-            </File>
-            <File>
               <FileName>STC32G_PWM.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\library\STC32G_PWM.c</FilePath>
-            </File>
-            <File>
-              <FileName>STC32G_Timer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\library\STC32G_Timer.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
           <GroupName>usb</GroupName>
           <Files>
-            <File>
-              <FileName>config.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\usb\config.h</FilePath>
-            </File>
             <File>
               <FileName>stc.h</FileName>
               <FileType>5</FileType>

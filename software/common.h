@@ -1,10 +1,11 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#include "STC32G.H"
-#include "stc.h"
+#include "AI8051U.h"
 #include "stdio.h"
-#include "intrins.h"
 #include "Type_def.h"
+#include "intrins.h"
+
+#define MAIN_Fosc        40000000UL
 
 #endif

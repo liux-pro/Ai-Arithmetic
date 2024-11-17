@@ -2,9 +2,7 @@
 #include "stdlib.h"
 #include "font.h" 
 #include "string.h"
-#include "STC32G.h"
-#include "STC32G_SPI.h"
-#include "STC32G_GPIO.h"
+
 
 //LCD的画笔颜色和背景色	   
 u16 POINT_COLOR=0x0000;	//画笔颜色
@@ -316,16 +314,18 @@ void Set_GPIO(void)
 
 //初始化lcd
 void LCD_Init(void)
-{
-	P2_MODE_IO_PU(GPIO_Pin_5 | GPIO_Pin_7);
-	P0_MODE_IO_PU(GPIO_Pin_5);
-	P5_MODE_IO_PU(GPIO_Pin_1);
-	P2_SPEED_HIGH(GPIO_Pin_5 | GPIO_Pin_7); // 电平转换速度快（提高IO口翻转速度）
-	P2_DRIVE_HIGH(GPIO_Pin_5 | GPIO_Pin_7);
-    P2_PULL_UP_ENABLE(GPIO_Pin_5 | GPIO_Pin_7);
-	
-	
-	{
+{	// P2.5 P2.7 准双向，上拉，强驱动电流，快转换速度
+    P2M0 &= ~0xa0;
+	P2M1 &= ~0xa0; 
+    P2PU |= 0xa0; 
+    P2SR &= ~0xa0; 
+    P2DR &= ~0xa0; 
+	// P0.5 准双向
+    P0M0 &= ~0x20; P0M1 &= ~0x20; 
+    // P5.1 准双向
+	P5M0 &= ~0x02; P5M1 &= ~0x02; 
+
+		{
 // 参数: io: 切换到的IO,            SS  MOSI MISO SCLK
 //                       0: 切换到 P1.4 P1.5 P1.6 P1.7
 //                       1: 切换到 P2.4 P2.5 P2.6 P2.7

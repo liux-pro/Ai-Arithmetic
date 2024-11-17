@@ -1,11 +1,10 @@
 #ifndef __STC_H__
 #define __STC_H__
 
+#include "AI8051U.H"
 #include <intrins.h>
 #include <stdio.h>
-
-#include "stc32g.h"
-#include "config.h"
+#include "usb_config.h"
 
 typedef bit BOOL;
 typedef unsigned char BYTE;
