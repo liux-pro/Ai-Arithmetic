@@ -20,7 +20,8 @@
         "stdint.h": "c",
         "sys.h": "c",
         "stc.h": "c",
-        "STDIO.H": "cpp"
+        "STDIO.H": "cpp",
+        "lcd.h": "c"
     },
     "files.encoding": "gb2312"
 }

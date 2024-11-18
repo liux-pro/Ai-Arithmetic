@@ -62,36 +62,38 @@ char putchar(char c)
 
 /**
  * @brief 扩展字符串至指定长度，使用指定字符填充不足的部分
- * 
+ *
  * 该函数将原始字符串扩展到指定的新长度。如果原始字符串的长度小于新长度，
  * 它将在字符串末尾添加指定字符，直到达到新长度。扩展后的字符串会以 '\0' 结尾。
- * 
+ *
  * @param buffer 输入的字符串缓冲区，原始字符串会被拓展
  * @param c 用于填充字符串的字符
  * @param new_length 扩展后的目标字符串长度
- * 
+ *
  * @note 如果原始字符串的长度已经大于或等于目标长度，函数不会做任何改变。
  */
-void paddingString(uint8_t *buffer, char c, uint8_t new_length) {
-    uint8_t current_length;
-    uint8_t i;
+void paddingString(uint8_t *buffer, char c, uint8_t new_length)
+{
+	uint8_t current_length;
+	uint8_t i;
 
-    current_length = (uint8_t)strlen((char *)buffer); // 获取当前字符串长度
+	current_length = (uint8_t)strlen((char *)buffer); // 获取当前字符串长度
 
-    // 如果当前长度已经大于或等于新长度，则无需填充
-    if (current_length >= new_length) {
-        return;
-    }
+	// 如果当前长度已经大于或等于新长度，则无需填充
+	if (current_length >= new_length)
+	{
+		return;
+	}
 
-    // 从当前字符串末尾开始填充，直到达到新长度
-    for (i = current_length; i < new_length; ++i) {
-        buffer[i] = c;
-    }
+	// 从当前字符串末尾开始填充，直到达到新长度
+	for (i = current_length; i < new_length; ++i)
+	{
+		buffer[i] = c;
+	}
 
-    // 添加字符串终止符
-    buffer[new_length] = '\0';
+	// 添加字符串终止符
+	buffer[new_length] = '\0';
 }
-
 
 // 插入usb线时，由于usb接口机械设计，vcc会先接通，然后才是d+d-
 // 而stc的逻辑是开机检测d+d-接好，且boot引脚P3.2为0，才进入usb下载模式
@@ -140,6 +142,7 @@ void interrupt0()
 int8 btn0;
 void main(void)
 {
+	bool beginner = true;
 	WTST = 0;  // 设置程序指令延时参数，赋值为0可将CPU执行指令的速度设置为最快
 	EAXFR = 1; // 扩展寄存器(XFR)访问使能
 	CKCON = 0; // 提高访问XRAM速度
@@ -167,6 +170,10 @@ void main(void)
 	// 先点屏幕数据，后点亮背光，避免显示出雪花屏
 	LCD_Clear(WHITE);
 	LCD_Fill_LARGE(0, 96 + 1, 319, 96 + 3, BLACK); // 再屏幕中间画一条线
+	POINT_COLOR = GRAY;
+	Show_Str(10, 30, "在这里输入表达式，支持加减乘除", 32, 0);
+	Show_Str(10, 150, "点击这里开始运算", 32, 0);
+	POINT_COLOR = BLACK;
 
 	// 点亮背光，最高亮度
 	configBackLightPWM(255);
@@ -244,8 +251,14 @@ void main(void)
 
 				// printf("\n字符数\xFD量: %d\n", char_count);
 
+				if (beginner)
+				{
+					beginner = false;
+					LCD_Fill(0, 96 + 3, 319, 239, WHITE);
+				}
+
 				sprintf(strBuffer, "result: %.2f", expression_calc(expression, expression_n));
-				//用在字符后面拼接空格的方法，清理残留字符，避免全屏刷新造成的闪烁。
+				// 用在字符后面拼接空格的方法，清理残留字符，避免全屏刷新造成的闪烁。
 				paddingString(strBuffer, ' ', 20);
 				Show_Str(10, 200, strBuffer, 24, 0);
 				expression_to_string(expression, expression_n, strBuffer);
