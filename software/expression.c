@@ -112,3 +112,34 @@ float expression_calc(uint8_t item[], uint8_t n) {
 
     return pop(&numStack);  // 最终结果
 }
+
+
+void expression_to_string(uint8_t *expression, uint8_t expr_length, uint8_t *buffer) {
+    uint8_t i;
+    uint8_t buffer_index = 0;
+
+    // 遍历表达式数组
+    for (i = 0; i < expr_length; i++) {
+        char ch;
+
+        // 根据表达式数组中的值选择相应的字符
+        if (expression[i] >= 0 && expression[i] <= 9) {
+            ch = '0' + expression[i];
+        } else if (expression[i] == 10) {
+            ch = '+';
+        } else if (expression[i] == 11) {
+            ch = '-';
+        } else if (expression[i] == 12) {
+            ch = '*';
+        } else if (expression[i] == 13) {
+            ch = '/';
+        } else {
+            // 如果遇到无效的数字，跳过
+            continue;
+        }
+        buffer[buffer_index++] = ch;
+    }
+
+    // 确保缓冲区以空字符结尾
+    buffer[buffer_index] = '\0';
+}

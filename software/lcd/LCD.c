@@ -50,14 +50,14 @@ u8 xdata DisTmp[3200]; // 显示缓冲，将要显示的内容放在显存里，启动DMA即可. 由于L
 
 #define DMA_SPI_ITVH (*(unsigned char volatile far *)0x7efa2e) /*  SPI_DMA时间间隔寄存器高字节 */
 #define DMA_SPI_ITVL (*(unsigned char volatile far *)0x7efa2f) /*  SPI_DMA时间间隔寄存器低字节 */
-void SPI_DMA_TRIG(u8 xdata *TxBuf)
+void SPI_DMA_TRIG(u8 xdata *TxBuf, u16 size)
 {
 	//@40MHz, Fosc/4, 200字节258us，100字节  130us，50字节66us，N个字节耗时 N*1.280+2 us, 51T一个字节，其中状态机19T, 传输耗时32T.
 	//@40MHz, Fosc/2, 200字节177us，100字节 89.5us，50字节46us，N个字节耗时 N*0.875+2 us, 35T一个字节，其中状态机19T, 传输耗时16T.
 	//@40MHz, Fosc/2, SPI DMA传输一个字节, FIFO=1, HOLD=0，耗时16+3=19T(0.475us), HOLD=3，耗时16+6=22T(0.55us).
 	//@40MHz, Fosc/4, SPI DMA传输一个字节, FIFO=1, HOLD=0，耗时32+3=35T(0.875us), HOLD=3，耗时32+6=38T(0.95us).
-	HSSPI_CFG = SS_HOLD | SS_SETUP;			  // SS_HOLD会增加N个系统时钟, SS_SETUP没有增加时钟。驱动OLED 40MHz时SS_HOLD可以设置为0，
-	HSSPI_CFG2 = SPI_IOSW | FIFOEN | SS_DACT; // FIFOEN允许FIFO会减小13个时钟.
+	HSSPI_CFG = SS_HOLD | SS_SETUP; // SS_HOLD会增加N个系统时钟, SS_SETUP没有增加时钟。驱动OLED 40MHz时SS_HOLD可以设置为0，
+	HSSPI_CFG2 = FIFOEN | SS_DACT;	// FIFOEN允许FIFO会减小13个时钟.
 
 	SPI_DC = 1; // 写数据
 	// P_LCD_CS  = 0;	//片选
@@ -66,8 +66,8 @@ void SPI_DMA_TRIG(u8 xdata *TxBuf)
 	SPI_TxAddr = (u16)TxBuf;			   // 要发送数据的首地址
 	DMA_SPI_TXAH = (u8)(SPI_TxAddr >> 8);  // 发送地址寄存器高字节
 	DMA_SPI_TXAL = (u8)SPI_TxAddr;		   // 发送地址寄存器低字节
-	DMA_SPI_AMTH = (u8)((3200 - 1) / 256); // 设置传输总字节数(高8位),	设置传输总字节数 = N+1
-	DMA_SPI_AMT = (u8)(3200 - 1);		   // 设置传输总字节数(低8位).
+	DMA_SPI_AMTH = (u8)((size - 1) / 256); // 设置传输总字节数(高8位),	设置传输总字节数 = N+1
+	DMA_SPI_AMT = (u8)(size - 1);		   // 设置传输总字节数(低8位).
 	DMA_SPI_ITVH = 0;
 	DMA_SPI_ITVL = 0;
 	DMA_SPI_STA = 0x00;
@@ -456,20 +456,7 @@ void LCD_Init(void)
 // color:要清屏的填充色
 void LCD_Clear(u16 color)
 {
-	u32 index = 0;
-	u32 totalpoint;
-
-	totalpoint = lcddev.width;
-	totalpoint *= lcddev.height; // 得到总点数
-	LCD_SetCursor(0, 0);		 // 设置光标位置
-	LCD_WriteRAM_Prepare();		 // 开始写入GRAM
-	SPI_DC = 1;
-	for (index = 0; index < totalpoint / 1600; index++)
-	{
-		SPI_DMA_TRIG(DisTmp); // 触发SPI DAM发送一个图片
-		while (B_SPI_DMA_busy)
-			; // 等待图片发送完毕
-	}
+	LCD_Fill_LARGE(0, 0, lcddev.width - 1, lcddev.height - 1, color);
 }
 // 在指定区域内填充指定颜色
 // 区域大小:(xend-xsta+1)*(yend-ysta+1)
@@ -487,6 +474,31 @@ void LCD_Fill(u16 sx, u16 sy, u16 ex, u16 ey, u16 color)
 		LCD_WriteRAM_Prepare(); // 开始写入GRAM
 		for (j = 0; j < xlen; j++)
 			LCD_WriteRAM(color); // 设置光标位置
+	}
+}
+
+// 在指定区域内填充指定颜色
+// 区域大小:(xend-xsta+1)*(yend-ysta+1)
+// xsta
+// color:要填充的颜色
+void LCD_Fill_LARGE(u16 sx, u16 sy, u16 ex, u16 ey, u16 color)
+{
+	u32 index = 0;
+	u32 w, h;
+	w = ex - sx + 1;
+	h = ey - sy + 1;
+
+	LCD_Set_Window(sx, sy, w, h);
+	LCD_WriteRAM_Prepare();
+	for (index = 0; index < 800 / 2; index++)
+	{
+		((u16 *)(DisTmp))[index] = color;
+	}
+	for (index = 0; index < w * h * 2 / 800 + 1; index++)
+	{
+		SPI_DMA_TRIG(DisTmp, 800); // 触发SPI DAM发送一个图片
+		while (B_SPI_DMA_busy)
+			; // 等待图片发送完毕
 	}
 }
 

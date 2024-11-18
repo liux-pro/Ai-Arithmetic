@@ -19,7 +19,8 @@
         "tinymaix.h": "c",
         "stdint.h": "c",
         "sys.h": "c",
-        "stc.h": "c"
+        "stc.h": "c",
+        "STDIO.H": "cpp"
     },
     "files.encoding": "gb2312"
 }
