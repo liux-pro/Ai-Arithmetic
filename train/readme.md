@@ -26,8 +26,8 @@ docker run --rm -v $(pwd):/workspace -w /workspace tensorflow \
           bash -c "papermill -k python --log-output good-mnist.ipynb output.ipynb"
 ```
 # 参考资料
-https://github.com/sipeed/TinyMaix
-https://www.ccom.ucsd.edu/~cdeotte/programs/MNIST.html
-https://www.kaggle.com/cdeotte/mnist-neural-network-coded-in-c-0-985
-https://www.kaggle.com/cdeotte/25-million-images-0-99757-mnist
-https://github.com/YoujiaZhang/MNIST-Calculator-Handwriting-recognition/
+https://github.com/sipeed/TinyMaix  
+https://www.ccom.ucsd.edu/~cdeotte/programs/MNIST.html  
+https://www.kaggle.com/cdeotte/mnist-neural-network-coded-in-c-0-985  
+https://www.kaggle.com/cdeotte/25-million-images-0-99757-mnist  
+https://github.com/YoujiaZhang/MNIST-Calculator-Handwriting-recognition/  
