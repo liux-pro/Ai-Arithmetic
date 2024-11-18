@@ -10,7 +10,7 @@ tensorflow训练，然后TinyMaix提供了脚本，自动把tensorflow转tflite�
 # 训练
 网络较小，训练很快，不需要GPU，CPU也能在10分钟内完成。
 ## 使用Windows训练
-使用 python3.9，使用venv避免干扰
+使用 python3.9，应使用venv避免干扰
 ```bash
 pip install -r requirements.txt #安装依赖
 papermill -k python --log-output good-mnist.ipynb output.ipynb
