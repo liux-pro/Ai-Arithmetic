@@ -127,6 +127,7 @@ void check_boot()
 	// 关闭上拉电阻
 	P3PU &= ~0x04;
 }
+int8 btn0;
 
 void interrupt0()
 // 用这个判断是否位keil编译器，避免vscode里不认keil语法报错
@@ -136,16 +137,18 @@ void interrupt0()
 #endif
 {
 	// 这个按钮没啥用，姑且配置为按下进下载模式
-	check_boot();
+	// check_boot();
+	btn0++;
 }
 
-int8 btn0;
 void main(void)
 {
 	bool beginner = true;
-	WTST = 0;  // 设置程序指令延时参数，赋值为0可将CPU执行指令的速度设置为最快
-	EAXFR = 1; // 扩展寄存器(XFR)访问使能
-	CKCON = 0; // 提高访问XRAM速度
+	
+	EAXSFR();	//允许访问扩展寄存器
+	WTST  = 0;
+	CKCON = 0;
+
 	check_boot();
 
 	{
@@ -171,7 +174,7 @@ void main(void)
 	LCD_Clear(WHITE);
 	LCD_Fill_LARGE(0, 96 + 1, 319, 96 + 3, BLACK); // 再屏幕中间画一条线
 	POINT_COLOR = GRAY;
-	Show_Str(10, 30, "在这里输入表达式，支持加减乘除", 32, 0);
+	Show_Str(10, 30, "在这里输入表达式", 32, 0);
 	Show_Str(10, 150, "点击这里开始运算", 32, 0);
 	POINT_COLOR = BLACK;
 

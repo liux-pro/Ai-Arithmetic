@@ -35,7 +35,7 @@ void usb_init()
     InEpState = 0x00;
     OutEpState = 0x00;
 
-    EUSB = 1;
+    IE2 |= EUSB;
 }
 
 BYTE usb_read_reg(BYTE addr)
@@ -71,7 +71,7 @@ BYTE usb_read_fifo(BYTE fifo, BYTE *pdat)
     return ret;
 }
 
-void usb_write_fifo(BYTE fifo, BYTE *pdat, BYTE cnt) reentrant
+void usb_write_fifo(BYTE fifo, BYTE *pdat, BYTE cnt)
 {
 	while (cnt--)
 	{

@@ -4,8 +4,8 @@
 #define ADC_SPEED 15	 /* 0~15, ADC转换时间(CPU时钟数) = (n+1)*32  ADCCFG */
 #define RES_FMT (1 << 5) /* ADC结果格式 0: 左对齐, ADC_RES: D11 D10 D9 D8 D7 D6 D5 D4, ADC_RESL: D3 D2 D1 D0 0 0 0 0 */
 						 /* ADCCFG      1: 右对齐, ADC_RES: 0 0 0 0 D11 D10 D9 D8, ADC_RESL: D7 D6 D5 D4 D3 D2 D1 D0 */
-						 
-//初始化触摸屏					 
+
+// 初始化触摸屏
 void touch_init()
 {
 	ADCTIM = 0x3f; // 设置通道选择时间、保持时间、采样时间
@@ -20,14 +20,16 @@ u16 Get_ADC12bitResult(u8 channel) // channel = 0~15
 	ADC_RESL = 0;
 
 	ADC_CONTR = (ADC_CONTR & 0xf0) | channel; // 设置ADC转换通道
-	ADC_START = 1;							  // 启动ADC转换
+	ADC_CONTR |= ADC_START;					  // 启动ADC转换
 	_nop_();
 	_nop_();
 	_nop_();
 	_nop_();
-	while (ADC_FLAG == 0)
-		;		  // wait for ADC finish
-	ADC_FLAG = 0; // 清除ADC结束标志
+	while (!(ADC_CONTR & ADC_FLAG))
+		;
+	// wait for ADC finish
+	ADC_CONTR &= ~ADC_FLAG; // 清除ADC结束标志
+
 	ADC_CONTR = (ADC_CONTR & 0xf0) | (u8)15;
 	return (((u16)ADC_RES << 8) | ADC_RESL);
 }

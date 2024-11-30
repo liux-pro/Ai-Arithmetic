@@ -21,7 +21,9 @@
         "sys.h": "c",
         "stc.h": "c",
         "STDIO.H": "cpp",
-        "lcd.h": "c"
+        "lcd.h": "c",
+        "ai8051u.h": "c",
+        "AI8051U.H": "cpp"
     },
     "files.encoding": "gb2312"
 }

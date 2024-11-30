@@ -3,7 +3,7 @@ void delay_ms(int count)
 {
     do
     {
-        unsigned long edata i;
+        unsigned long i;
         _nop_();
         i = 8293UL;
         while (i)

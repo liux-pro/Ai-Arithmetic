@@ -9,11 +9,11 @@ uint8_t xdata mdl_buf[MDL_BUF_LEN];
 uint8_t xdata input_image[IMAGE_WIDTH * IMAGE_HEIGHT] = {0};
 // 这里可以用bitmap优化，但是没必要，内存够用
 
-tm_mdl_t mdl;
-tm_mat_t in_uint8;
-tm_mat_t in;
-tm_mat_t outs[1];
-tm_err_t res;
+tm_mdl_t xdata mdl;
+tm_mat_t xdata in_uint8;
+tm_mat_t xdata in;
+tm_mat_t xdata outs[1];
+tm_err_t xdata res;
 
 static tm_err_t layer_cb(tm_mdl_t *mdl, tml_head_t *lh)
 {
@@ -59,11 +59,12 @@ void clean_input_image()
 // 处理模型输出的结果，返回识别出的数字
 uint8_t parse_output(tm_mat_t *outs)
 {
-	tm_mat_t out = outs[0];
+	tm_mat_t out;
 	float *dat = (float *)out.dat;
 	float maxp = 0;
 	int maxi = -1;
 	int i = 0;
+	out = outs[0];
 	for (; i < CLASS_N; i++)
 	{
 		if (dat[i] > maxp)
@@ -93,7 +94,7 @@ void Ai_init()
 	res = tm_load(&mdl, mdl_data, mdl_buf, layer_cb, &in);
 	if (res != TM_OK)
 	{
-		TM_PRINTF("tm model load err %d\r\n", res);
+		//		TM_PRINTF("tm model load err %d\r\n", res);
 		return;
 	}
 }

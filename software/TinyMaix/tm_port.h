@@ -41,9 +41,9 @@ limitations under the License.
 #define tm_malloc(x)    malloc(x)
 #define tm_free(x)      free(x)
 
-#define TM_PRINTF(...) printf(__VA_ARGS__)
-#define TM_DBG(...)    //TM_PRINTF("###L%d: ",__LINE__);TM_PRINTF(__VA_ARGS__);
-#define TM_DBGL()      TM_PRINTF("###L%d\r\n",__LINE__);
+//#define TM_PRINTF(...) printf(__VA_ARGS__)
+//#define TM_DBG(...)    //TM_PRINTF("###L%d: ",__LINE__);TM_PRINTF(__VA_ARGS__);
+//#define TM_DBGL()      TM_PRINTF("###L%d\r\n",__LINE__);
 
 /******************************* DBG TIME CONFIG  ************************************/
 extern uint32_t systick;

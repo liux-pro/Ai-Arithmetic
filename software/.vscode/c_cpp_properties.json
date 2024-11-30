@@ -9,8 +9,8 @@
                 "${workspaceFolder}/usb",
                 "${workspaceFolder}/library",
                 "${workspaceFolder}/",
-                "D:\\Software\\KeilC251\\C251\\INC",
-                "D:\\Software\\KeilC251\\C251\\INC\\STC"
+                "D:\\Software\\KeilC51\\C51\\INC",
+                "D:\\Software\\KeilC51\\C51\\INC\\STC"
             ],
             "defines": [
                 "_DEBUG",

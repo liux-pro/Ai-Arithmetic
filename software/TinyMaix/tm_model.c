@@ -155,8 +155,8 @@ tm_err_t TM_WEAK tm_run(tm_mdl_t *mdl, tm_mat_t *in, tm_mat_t *out) {
     }
     if (res != TM_OK)
       return res;
-    if (mdl->cb)
-      ((tm_cb_t)mdl->cb)(mdl, h); // layer callback
+    // if (mdl->cb)
+    //   ((tm_cb_t)mdl->cb)(mdl, h); // layer callback
     if (h->is_out) {
       memcpy((void *)(&out[out_idx]), (void *)(&(h->out_dims)),
              sizeof(uint16_t) * 4);
@@ -165,7 +165,7 @@ tm_err_t TM_WEAK tm_run(tm_mdl_t *mdl, tm_mat_t *in, tm_mat_t *out) {
         out[out_idx].dat = (mtype_t *)(TML_GET_OUTPUT(mdl, h));
       else {
         int out_size = h->out_dims[1] * h->out_dims[2] * h->out_dims[3];
-        float *outf = (float *)(TM_ALIGN(TML_GET_OUTPUT(mdl, h) + out_size));
+        float *outf = (float *)((TML_GET_OUTPUT(mdl, h) + out_size));
         for (i = 0; i < out_size; i++) // do dequant
           outf[i] = TML_DEQUANT(h, (TML_GET_OUTPUT(mdl, h))[i]);
         out[out_idx].dat = (uint8_t *)outf;

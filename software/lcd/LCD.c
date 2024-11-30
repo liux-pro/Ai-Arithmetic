@@ -48,8 +48,8 @@ u8 xdata DisTmp[3200]; // 显示缓冲，将要显示的内容放在显存里，启动DMA即可. 由于L
 #define FIFOEN (1 << 4)	  // bit4:高速SPI的FIFO模式使能位，0：关闭FIFO模式，1：使能FIFO模式，使能FIFO模式在DMA中减少13个系统时间。
 #define SS_DACT 3		  // bit3~0:高速模式时SS控制信号的DEACTIVE时间，0~15, 默认3, 不影响DMA时间.  当SPI速度为系统时钟/2时执行DMA，SS_HOLD、SS_SETUP和SS_DACT都必须设置大于2的值.
 
-#define DMA_SPI_ITVH (*(unsigned char volatile far *)0x7efa2e) /*  SPI_DMA时间间隔寄存器高字节 */
-#define DMA_SPI_ITVL (*(unsigned char volatile far *)0x7efa2f) /*  SPI_DMA时间间隔寄存器低字节 */
+// #define DMA_SPI_ITVH (*(unsigned char volatile far *)0x7efa2e) /*  SPI_DMA时间间隔寄存器高字节 */
+// #define DMA_SPI_ITVL (*(unsigned char volatile far *)0x7efa2f) /*  SPI_DMA时间间隔寄存器低字节 */
 void SPI_DMA_TRIG(u8 xdata *TxBuf, u16 size)
 {
 	//@40MHz, Fosc/4, 200字节258us，100字节  130us，50字节66us，N个字节耗时 N*1.280+2 us, 51T一个字节，其中状态机19T, 传输耗时32T.
@@ -115,12 +115,12 @@ void SPI_Config(u8 SPI_io, u8 SPI_speed)
 	SPI_io &= 3;
 
 	SPCTL = SPI_speed & 3; // 配置SPI 速度, 这条指令先执行, 顺便Bit7~Bit2清0
-	SSIG = 1;			   // 1: 忽略SS脚，由MSTR位决定主机还是从机		0: SS脚用于决定主机还是从机。
-	SPEN = 1;			   // 1: 允许SPI，								0：禁止SPI，所有SPI管脚均为普通IO
-	DORD = 0;			   // 1：LSB先发，								0：MSB先发
-	MSTR = 1;			   // 1：设为主机								0：设为从机
-	CPOL = 1;			   // 1: 空闲时SCLK为高电平，					0：空闲时SCLK为低电平
-	CPHA = 1;			   // 1: 数据在SCLK前沿驱动,后沿采样.			0: 数据在SCLK前沿采样,后沿驱动.
+	SPCTL |= SSIG;	//1: 忽略SS脚，由MSTR位决定主机还是从机		0: SS脚用于决定主机还是从机。
+	SPCTL |= SPEN;	//1: 允许SPI，								0：禁止SPI，所有SPI管脚均为普通IO
+	SPCTL &= ~DORD;	//1：LSB先发，								0：MSB先发
+	SPCTL |= MSTR;	//1：设为主机								0：设为从机
+	SPCTL |= CPOL;	//1: 空闲时SCLK为高电平，					0：空闲时SCLK为低电平
+	SPCTL |= CPHA;	//1: 数据在SCLK前沿驱动,后沿采样.			0: 数据在SCLK前沿采样,后沿驱动.
 	//	SPR1 = 0;	//SPR1,SPR0   00: fosc/4,     01: fosc/8
 	//	SPR0 = 0;	//            10: fosc/16,    11: fosc/2
 	P_SW1 = (P_SW1 & ~0x0c) | ((SPI_io << 2) & 0x0c); // 切换IO
@@ -133,8 +133,7 @@ void SPI_Config(u8 SPI_io, u8 SPI_speed)
 void SoftSPI_WriteByte(u8 Byte)
 {
 	SPDAT = Byte; // 发送一个字节
-	while (SPIF == 0)
-		;				  // 等待发送完成
+	while((SPSTAT & SPIF)==0)	;			//等待发送完成
 	SPSTAT = 0x80 + 0x40; // 清0 SPIF和WCOL标志
 }
 

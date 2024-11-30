@@ -38,7 +38,7 @@ void uart_send(int size)
     BYTE cnt;
     int addr;
     
-    EUSB = 0;
+    IE2 &= ~EUSB;
     usb_write_reg(INDEX, 1);
     
     addr = 0;
@@ -51,17 +51,17 @@ void uart_send(int size)
         size -= cnt;
     } while (cnt >= 64);
     
-    EUSB = 1;
+    IE2 |= EUSB;
 }
 
 //对接收的数据处理完成后,一定要调用一次这个函数,以便CDC接收下一笔串口数据
 void uart_recv_done()
 {
-    EUSB = 0;
+    IE2 &= ~EUSB;
     
     RxFlag = 0;
     usb_write_reg(INDEX, 1);
     usb_write_reg(OUTCSR1, 0);
     
-    EUSB = 1;
+    IE2 |= EUSB;
 }

@@ -70,7 +70,7 @@ void usb_init();
 BYTE usb_read_reg(BYTE addr);
 void usb_write_reg(BYTE addr, BYTE dat);
 BYTE usb_read_fifo(BYTE fifo, BYTE *pdat);
-void usb_write_fifo(BYTE fifo, BYTE *pdat, BYTE cnt) reentrant;
+void usb_write_fifo(BYTE fifo, BYTE *pdat, BYTE cnt);
 
 void usb_setup_stall();
 void usb_setup_in();
